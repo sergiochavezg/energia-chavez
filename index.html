@@ -4,64 +4,805 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Energía Chávez | Gestión Energética</title>
+<title>Energía Chávez | Dashboard Energético</title>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+
 <style>
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #eef3f8;
-  color: #17324d;
+:root{
+  --azul:#102b48;
+  --verde:#078b94;
+  --fondo:#edf3f8;
+  --texto:#18324b;
+  --gris:#687b8c;
 }
-header {
-  background: linear-gradient(120deg,#102b48,#087f91);
-  color: white;
-  text-align: center;
-  padding: 65px 20px;
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:var(--fondo);
+  color:var(--texto);
 }
-h1 { font-size: 42px; margin: 0 0 15px; }
-header p { font-size: 19px; }
-main {
-  max-width: 1100px;
-  margin: 35px auto;
-  padding: 20px;
+header{
+  background:linear-gradient(110deg,#102b48,#087f91);
+  color:white;
+  padding:28px 5%;
 }
-.card {
-  background: white;
-  padding: 35px;
-  border-radius: 15px;
-  text-align: center;
-  box-shadow: 0 5px 20px #102b4815;
+header h1{margin:0;font-size:30px}
+header p{margin:8px 0 0;color:#d9edf1}
+main{max-width:1550px;margin:auto;padding:18px}
+.panel,.kpi{
+  background:white;
+  border-radius:13px;
+  padding:20px;
+  box-shadow:0 3px 15px #102b4810;
 }
-button {
-  background: #087f91;
-  border: 0;
-  color: white;
-  padding: 14px 25px;
-  border-radius: 8px;
-  font-size: 16px;
+.panel{margin-bottom:16px}
+h2{margin:0 0 17px;font-size:19px}
+.filtros{
+  display:flex;
+  flex-wrap:wrap;
+  gap:15px;
+  align-items:end;
 }
-footer {
-  text-align: center;
-  padding: 30px;
-  color: #708396;
+label{
+  display:block;
+  font-size:12px;
+  font-weight:bold;
+  margin-bottom:6px;
+}
+select,input{
+  padding:11px;
+  border:1px solid #ccd8e2;
+  border-radius:7px;
+  background:white;
+  color:var(--texto);
+  max-width:100%;
+}
+input[type=number]{width:135px}
+button{
+  padding:11px 17px;
+  border:0;
+  border-radius:7px;
+  background:var(--verde);
+  color:white;
+  cursor:pointer;
+}
+.kpis{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(185px,1fr));
+  gap:14px;
+  margin-bottom:16px;
+}
+.kpi{border-top:4px solid var(--verde)}
+.kpi small{color:var(--gris)}
+.kpi strong{
+  display:block;
+  margin-top:12px;
+  font-size:23px;
+  color:var(--verde);
+  overflow-wrap:anywhere;
+}
+.graficos{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:16px;
+}
+.grafico{height:330px}
+.nota{
+  font-size:13px;
+  color:var(--gris);
+  line-height:1.6;
+}
+.alerta{
+  padding:12px;
+  border-radius:8px;
+  background:#fff3d8;
+  color:#795a16;
+  font-size:13px;
+  line-height:1.5;
+}
+.tabla{overflow-x:auto}
+table{
+  width:100%;
+  border-collapse:collapse;
+  white-space:nowrap;
+}
+th,td{
+  padding:12px;
+  border-bottom:1px solid #e0e8ee;
+  text-align:right;
+}
+th{
+  background:#edf4f8;
+  font-size:13px;
+}
+td:first-child,th:first-child{text-align:left}
+footer{
+  padding:25px;
+  text-align:center;
+  color:var(--gris);
+}
+@media(max-width:800px){
+  .graficos{grid-template-columns:1fr}
+  header h1{font-size:25px}
+  main{padding:10px}
 }
 </style>
 </head>
+
 <body>
 <header>
-<h1>⚡ ENERGÍA CHÁVEZ</h1>
-<p>Plataforma de Gestión y Análisis Energético</p>
+  <h1>⚡ ENERGÍA CHÁVEZ</h1>
+  <p>Plataforma pública de análisis energético y facturación</p>
 </header>
+
 <main>
-<section class="card">
-<h2>Bienvenidos a Energía Chávez</h2>
-<p>Próximamente podrás consultar:</p>
-<p>Consumos eléctricos • Demandas máximas •
-Tarifas • Facturación • Indicadores energéticos</p>
-<p>Dashboard energético en preparación.</p>
+
+<section class="panel">
+<h2>1. Consulta de información energética</h2>
+
+<div class="filtros">
+  <div>
+    <label>Año</label>
+    <select id="anio">
+      <option value="todos">Todos</option>
+    </select>
+  </div>
+
+  <div>
+    <label>Mes</label>
+    <select id="mes">
+      <option value="todos">Todos</option>
+    </select>
+  </div>
+
+  <div>
+    <label>Indicador principal</label>
+    <select id="indicador">
+      <option value="total">Consumo total (kWh)</option>
+      <option value="a">Consumo A (kWh)</option>
+      <option value="b">Consumo B (kWh)</option>
+      <option value="nocturno">Registro nocturno (kWh)</option>
+      <option value="findesemana">Sábados, domingos y feriados (kWh)</option>
+      <option value="demanda">Demanda máxima (kW)</option>
+      <option value="fp">Factor de potencia</option>
+    </select>
+  </div>
+
+  <div>
+    <label>Tipo de gráfico</label>
+    <select id="tipo">
+      <option value="bar">Barras</option>
+      <option value="line">Líneas</option>
+    </select>
+  </div>
+</div>
+
+<p id="estado" class="nota">
+  Cargando base de consumos energéticos...
+</p>
 </section>
+
+<section class="kpis" id="kpis"></section>
+
+<section class="graficos">
+  <div class="panel">
+    <h2 id="tituloPrincipal">Consumo energético</h2>
+    <div class="grafico"><canvas id="graficoPrincipal"></canvas></div>
+  </div>
+
+  <div class="panel">
+    <h2>Consumos por registros</h2>
+    <div class="grafico"><canvas id="graficoFranjas"></canvas></div>
+  </div>
+
+  <div class="panel">
+    <h2>Demanda máxima mensual</h2>
+    <div class="grafico"><canvas id="graficoDemanda"></canvas></div>
+  </div>
+
+  <div class="panel">
+    <h2>Factor de potencia mensual</h2>
+    <div class="grafico"><canvas id="graficoFP"></canvas></div>
+  </div>
+</section>
+
+<section class="panel">
+<h2>2. Tarifas y parámetros de facturación</h2>
+
+<p class="nota">
+  Las tarifas iniciales son referencias calculadas a partir
+  de una factura CNEL de septiembre de 2026.
+  Deben revisarse para cada período.
+</p>
+
+<div class="filtros">
+  <div><label>Tarifa A USD/kWh</label>
+    <input id="ta" type="number" step="0.00001" value="0.1178">
+  </div>
+  <div><label>Tarifa B USD/kWh</label>
+    <input id="tb" type="number" step="0.00001" value="0.1318">
+  </div>
+  <div><label>Tarifa C USD/kWh</label>
+    <input id="tc" type="number" step="0.00001" value="0.1001">
+  </div>
+  <div><label>Tarifa D USD/kWh</label>
+    <input id="td" type="number" step="0.00001" value="0.1178">
+  </div>
+  <div><label>Demanda USD/kW</label>
+    <input id="tkw" type="number" step="0.000001" value="4.575993">
+  </div>
+  <div><label>Franja D kWh (factura)</label>
+    <input id="d" type="number" min="0" step="1" placeholder="Ingresar">
+  </div>
+  <div><label>Descuento AGP USD</label>
+    <input id="agp" type="number" step="0.01" value="0">
+  </div>
+  <div><label>Comercialización USD</label>
+    <input id="com" type="number" step="0.01" value="1.41">
+  </div>
+  <div><label>Alumbrado USD</label>
+    <input id="alumbrado" type="number" step="0.01" value="0">
+  </div>
+  <div><label>Penalización FP USD</label>
+    <input id="multa" type="number" step="0.01" value="0">
+  </div>
+  <div><label>Otros cargos netos USD</label>
+    <input id="otros" type="number" step="0.01" value="0">
+  </div>
+</div>
+
+<p class="alerta">
+  El registro 5KWH corresponde a toda la energía de sábados,
+  domingos y feriados; no equivale exclusivamente a la franja D.
+  La franja D debe obtenerse de la factura o de registros horarios.
+  El costo total se mostrará como pendiente mientras falte ese dato.
+  La penalización de factor de potencia se ingresa manualmente.
+</p>
+</section>
+
+<section class="graficos">
+  <div class="panel">
+    <h2>Costos estimados por franja</h2>
+    <div class="grafico"><canvas id="graficoCostos"></canvas></div>
+  </div>
+
+  <div class="panel">
+    <h2>Distribución energética del período</h2>
+    <div class="grafico"><canvas id="graficoDistribucion"></canvas></div>
+  </div>
+</section>
+
+<section class="panel">
+<h2>3. Resumen de facturación</h2>
+<p id="conciliacion" class="nota"></p>
+<div class="tabla">
+<table>
+<thead>
+<tr>
+  <th>Concepto</th>
+  <th>Cantidad</th>
+  <th>Valor USD</th>
+</tr>
+</thead>
+<tbody id="facturacion"></tbody>
+</table>
+</div>
+</section>
+
+<section class="panel">
+<h2>4. Histórico de consumos y demandas</h2>
+<div class="tabla">
+<table>
+<thead>
+<tr>
+  <th>Mes</th>
+  <th>Total kWh</th>
+  <th>A kWh</th>
+  <th>B kWh</th>
+  <th>Nocturno kWh</th>
+  <th>S/D/F kWh</th>
+  <th>Demanda kW</th>
+  <th>FP</th>
+  <th>Alertas</th>
+</tr>
+</thead>
+<tbody id="historico"></tbody>
+</table>
+</div>
+</section>
+
 </main>
-<footer>© 2026 Energía Chávez</footer>
+
+<footer>
+© 2026 Energía Chávez · Plataforma de análisis energético
+</footer>
+
+<script>
+const MULTIPLICADOR = 350;
+const $ = id => document.getElementById(id);
+
+const meses = [
+  "Enero","Febrero","Marzo","Abril","Mayo","Junio",
+  "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
+];
+
+let lecturas = [];
+let graficos = {};
+
+function normalizar(texto){
+  return String(texto ?? "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-z0-9]/g,"");
+}
+
+function campo(fila,nombre){
+  const clave = Object.keys(fila).find(
+    k => normalizar(k) === normalizar(nombre)
+  );
+  return clave === undefined ? null : fila[clave];
+}
+
+function numero(valor){
+  if(typeof valor === "number")
+    return Number.isFinite(valor) ? valor : null;
+
+  if(valor === null || valor === undefined || String(valor).trim()==="")
+    return null;
+
+  let s = String(valor).trim().replace(/\s/g,"");
+
+  if(s.includes(",") && s.includes(".")){
+    s = s.lastIndexOf(",") > s.lastIndexOf(".")
+      ? s.replace(/\./g,"").replace(",",".")
+      : s.replace(/,/g,"");
+  }else{
+    s = s.replace(",",".");
+  }
+
+  const n = Number(s);
+  return Number.isFinite(n) ? n : null;
+}
+
+function fecha(valor){
+  if(valor instanceof Date)
+    return isNaN(valor.getTime()) ? null : valor;
+
+  if(typeof valor === "number"){
+    const f = XLSX.SSF.parse_date_code(valor);
+    return f ? new Date(f.y,f.m-1,f.d) : null;
+  }
+
+  const s = String(valor ?? "").trim();
+  const m = s.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})/);
+
+  if(m) return new Date(+m[3],+m[2]-1,+m[1]);
+
+  const f = new Date(s);
+  return isNaN(f.getTime()) ? null : f;
+}
+
+function formato(n,d=0){
+  return n === null || n === undefined
+    ? "—"
+    : Number(n).toLocaleString("es-EC",{
+        minimumFractionDigits:d,
+        maximumFractionDigits:d
+      });
+}
+
+function dinero(n){
+  return n === null || n === undefined
+    ? "Pendiente"
+    : "$" + formato(n,2);
+}
+
+function entrada(id){
+  return numero($(id).value);
+}
+
+function positivo(id){
+  return Math.max(0,entrada(id) ?? 0);
+}
+
+function crearGrafico(id,tipo,etiquetas,datasets){
+  if(graficos[id]) graficos[id].destroy();
+
+  graficos[id] = new Chart($(id),{
+    type:tipo,
+    data:{labels:etiquetas,datasets},
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      interaction:{mode:"index",intersect:false},
+      scales:tipo==="doughnut"
+        ? {}
+        : {y:{beginAtZero:tipo==="bar"}}
+    }
+  });
+}
+
+function serie(nombre,datos,color){
+  return {
+    label:nombre,
+    data:datos,
+    backgroundColor:color,
+    borderColor:color,
+    borderWidth:2,
+    tension:0.25
+  };
+}
+
+async function cargarExcel(){
+  try{
+    if(!window.XLSX || !window.Chart)
+      throw new Error("No se pudieron cargar las librerías.");
+
+    const respuesta = await fetch("./consumos.xlsx",{
+      cache:"no-store"
+    });
+
+    if(!respuesta.ok)
+      throw new Error(
+        "No se encontró consumos.xlsx. Súbelo a GitHub."
+      );
+
+    const archivo = await respuesta.arrayBuffer();
+
+    const libro = XLSX.read(archivo,{
+      type:"array",
+      cellDates:true
+    });
+
+    const hoja = libro.SheetNames.find(
+      n => normalizar(n) === normalizar("BASE REFRISTORE")
+    );
+
+    if(!hoja)
+      throw new Error("No existe la hoja BASE REFRISTORE.");
+
+    const datos = XLSX.utils.sheet_to_json(
+      libro.Sheets[hoja],{defval:null}
+    );
+
+    lecturas = datos.map((r,i)=>({
+      orden:i,
+      fecha:fecha(campo(r,"fecha")),
+      registros:[1,2,3,4,5].map(
+        n=>numero(campo(r,n+"KWH"))
+      ),
+      demanda:numero(campo(r,"kreal fact max")),
+      fp:numero(campo(r,"fp")),
+      energia:[0,0,0,0,0],
+      alertas:0
+    })).filter(r=>r.fecha && !isNaN(r.fecha.getTime()));
+
+    lecturas.sort(
+      (a,b)=>a.fecha-b.fecha || a.orden-b.orden
+    );
+
+    const anteriores = Array(5).fill(null);
+
+    for(const r of lecturas){
+      for(let i=0;i<5;i++){
+        const actual = r.registros[i];
+
+        if(actual === null) continue;
+
+        if(anteriores[i] !== null){
+          const diferencia = actual-anteriores[i];
+
+          if(diferencia >= 0){
+            r.energia[i] = diferencia*MULTIPLICADOR;
+          }else{
+            r.alertas++;
+          }
+        }
+
+        anteriores[i] = actual;
+      }
+    }
+
+    const anios = [...new Set(
+      lecturas.map(r=>r.fecha.getFullYear())
+    )].sort();
+
+    $("anio").innerHTML =
+      '<option value="todos">Todos</option>'+
+      anios.map(y=>`<option value="${y}">${y}</option>`).join("");
+
+    $("mes").innerHTML =
+      '<option value="todos">Todos</option>'+
+      meses.map((m,i)=>`<option value="${i}">${m}</option>`).join("");
+
+    $("anio").value = String(anios.at(-1));
+    $("mes").value = "todos";
+
+    actualizar();
+
+  }catch(error){
+    $("estado").textContent = "Error: " + error.message;
+  }
+}
+
+function agrupar(filas){
+  const energia = Array(5).fill(0);
+  let demanda = null;
+  let sumaFP = 0;
+  let cantidadFP = 0;
+  let alertas = 0;
+
+  for(const r of filas){
+    r.energia.forEach((v,i)=>energia[i]+=v);
+
+    if(r.demanda !== null && r.demanda >= 0){
+      demanda = Math.max(demanda ?? r.demanda,r.demanda);
+    }
+
+    if(r.fp !== null && r.fp > 0 && r.fp <= 1){
+      sumaFP += r.fp;
+      cantidadFP++;
+    }
+
+    alertas += r.alertas;
+  }
+
+  return {
+    energia,
+    demanda,
+    fp:cantidadFP ? sumaFP/cantidadFP : null,
+    alertas,
+    cantidad:filas.length
+  };
+}
+
+function actualizar(){
+  if(!lecturas.length) return;
+
+  const anio = $("anio").value;
+  const mes = $("mes").value;
+
+  const filtradas = lecturas.filter(r=>
+    (anio==="todos" || r.fecha.getFullYear()===+anio) &&
+    (mes==="todos" || r.fecha.getMonth()===+mes)
+  );
+
+  const resumen = agrupar(filtradas);
+
+  $("estado").textContent =
+    `${filtradas.length} lecturas seleccionadas · `+
+    `Multiplicador ${MULTIPLICADOR} · `+
+    `${resumen.alertas} descensos de lectura por revisar`;
+
+  const grupos = {};
+
+  for(const r of lecturas){
+    if(anio!=="todos" && r.fecha.getFullYear()!==+anio)
+      continue;
+
+    const clave = r.fecha.getFullYear()+"-"+
+      String(r.fecha.getMonth()+1).padStart(2,"0");
+
+    (grupos[clave] ??= []).push(r);
+  }
+
+  const etiquetas = Object.keys(grupos).sort();
+  const resumenes = etiquetas.map(k=>agrupar(grupos[k]));
+
+  const total = resumen.energia[0];
+  const A = resumen.energia[1];
+  const B = resumen.energia[2];
+  const nocturno = resumen.energia[3];
+  const finSemana = resumen.energia[4];
+
+  const mesUnico = anio!=="todos" && mes!=="todos";
+  const D = entrada("d");
+
+  const C = D===null ? null : total-A-B-D;
+
+  const valido =
+    mesUnico &&
+    resumen.cantidad>0 &&
+    D!==null &&
+    D>=0 &&
+    D<=finSemana &&
+    C>=0;
+
+  const cantidades = [A,B,C,D];
+
+  const tarifas = [
+    positivo("ta"),
+    positivo("tb"),
+    positivo("tc"),
+    positivo("td")
+  ];
+
+  const costos = valido
+    ? cantidades.map((q,i)=>q*tarifas[i])
+    : null;
+
+  const costoEnergia = costos
+    ? costos.reduce((a,b)=>a+b,0)
+    : null;
+
+  const costoDemanda =
+    mesUnico && resumen.demanda!==null
+      ? resumen.demanda*positivo("tkw")
+      : null;
+
+  const totalFactura =
+    costoEnergia!==null && costoDemanda!==null
+      ? costoEnergia+
+        costoDemanda+
+        positivo("com")+
+        positivo("alumbrado")+
+        positivo("multa")+
+        (entrada("otros") ?? 0)-
+        positivo("agp")
+      : null;
+
+  const indicadores = [
+    ["Consumo total",formato(total)+" kWh"],
+    ["Franja A",formato(A)+" kWh"],
+    ["Franja B",formato(B)+" kWh"],
+    ["Registro nocturno",formato(nocturno)+" kWh"],
+    ["Sábados/domingos/feriados",formato(finSemana)+" kWh"],
+    ["Demanda máxima",
+      resumen.demanda===null
+        ? "—"
+        : formato(resumen.demanda,2)+" kW"],
+    ["Factor de potencia",formato(resumen.fp,4)],
+    ["Alertas de lectura",formato(resumen.alertas)],
+    ["Costo energía",dinero(costoEnergia)],
+    ["Costo demanda",dinero(costoDemanda)],
+    ["Costo total estimado",dinero(totalFactura)]
+  ];
+
+  $("kpis").innerHTML = indicadores.map(([nombre,valor])=>`
+    <div class="kpi">
+      <small>${nombre}</small>
+      <strong>${valor}</strong>
+    </div>
+  `).join("");
+
+  const series = {
+    total:resumenes.map(r=>r.energia[0]),
+    a:resumenes.map(r=>r.energia[1]),
+    b:resumenes.map(r=>r.energia[2]),
+    nocturno:resumenes.map(r=>r.energia[3]),
+    findesemana:resumenes.map(r=>r.energia[4]),
+    demanda:resumenes.map(r=>r.demanda),
+    fp:resumenes.map(r=>r.fp)
+  };
+
+  const indicador = $("indicador").value;
+
+  const titulo =
+    $("indicador").selectedOptions[0].textContent;
+
+  $("tituloPrincipal").textContent = titulo;
+
+  crearGrafico(
+    "graficoPrincipal",
+    $("tipo").value,
+    etiquetas,
+    [serie(titulo,series[indicador],"#078b94")]
+  );
+
+  crearGrafico(
+    "graficoFranjas","bar",etiquetas,[
+      serie("Total",resumenes.map(r=>r.energia[0]),"#087f91"),
+      serie("A",resumenes.map(r=>r.energia[1]),"#e5a026"),
+      serie("B",resumenes.map(r=>r.energia[2]),"#527fc7"),
+      serie("Nocturno",resumenes.map(r=>r.energia[3]),"#51a385"),
+      serie("S/D/F",resumenes.map(r=>r.energia[4]),"#a476b6")
+    ]
+  );
+
+  crearGrafico(
+    "graficoDemanda","line",etiquetas,[
+      serie("Demanda kW",
+        resumenes.map(r=>r.demanda),"#e5a026")
+    ]
+  );
+
+  crearGrafico(
+    "graficoFP","line",etiquetas,[
+      serie("Factor de potencia",
+        resumenes.map(r=>r.fp),"#417acb")
+    ]
+  );
+
+  crearGrafico(
+    "graficoCostos","bar",["A","B","C","D"],[
+      serie("USD",
+        costos ?? [null,null,null,null],
+        "#159473")
+    ]
+  );
+
+  crearGrafico(
+    "graficoDistribucion","doughnut",
+    ["A","B","C","D"],[
+      {
+        label:"kWh",
+        data:valido ? cantidades : [0,0,0,0],
+        backgroundColor:[
+          "#e5a026","#527fc7","#51a385","#a476b6"
+        ]
+      }
+    ]
+  );
+
+  $("conciliacion").textContent =
+    "Registro 1 (total): "+formato(total)+" kWh. "+
+    "Registro 2: "+formato(A)+" kWh. "+
+    "Registro 3: "+formato(B)+" kWh. "+
+    "Registro 4: "+formato(nocturno)+" kWh. "+
+    "Registro 5: "+formato(finSemana)+" kWh. "+
+    "Los registros no se suman automáticamente porque "+
+    "pueden existir solapamientos. "+
+    (valido
+      ? "Franja C calculada provisionalmente como "+
+        "total menos A, B y D. Verificar con CNEL."
+      : "Seleccione un solo mes e ingrese la franja D "+
+        "de la factura para calcular los costos.");
+
+  const filasFactura = [
+    ["Franja A",A,costos?.[0]],
+    ["Franja B",B,costos?.[1]],
+    ["Franja C provisional",C,costos?.[2]],
+    ["Franja D",D,costos?.[3]],
+    ["Demanda",resumen.demanda,costoDemanda],
+    ["Comercialización",null,
+      mesUnico?positivo("com"):null],
+    ["Descuento AGP",null,
+      mesUnico?-positivo("agp"):null],
+    ["Alumbrado",null,
+      mesUnico?positivo("alumbrado"):null],
+    ["Penalización FP",null,
+      mesUnico?positivo("multa"):null],
+    ["Otros cargos netos",null,
+      mesUnico?(entrada("otros")??0):null],
+    ["TOTAL ESTIMADO",null,totalFactura]
+  ];
+
+  $("facturacion").innerHTML =
+    filasFactura.map(([nombre,cantidad,costo])=>`
+      <tr>
+        <td>${nombre}</td>
+        <td>${formato(cantidad,2)}</td>
+        <td>${dinero(costo)}</td>
+      </tr>
+    `).join("");
+
+  $("historico").innerHTML =
+    etiquetas.map((k,i)=>{
+      const r=resumenes[i];
+
+      return `<tr>
+        <td>${k}</td>
+        ${r.energia.map(v=>`<td>${formato(v)}</td>`).join("")}
+        <td>${formato(r.demanda,2)}</td>
+        <td>${formato(r.fp,4)}</td>
+        <td>${r.alertas}</td>
+      </tr>`;
+    }).join("");
+}
+
+[
+  "anio","mes","indicador","tipo",
+  "ta","tb","tc","td","tkw","d",
+  "agp","com","alumbrado","multa","otros"
+].forEach(id=>{
+  $(id).addEventListener("change",actualizar);
+});
+
+cargarExcel();
+</script>
 </body>
 </html>
