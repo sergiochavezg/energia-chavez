@@ -4,805 +4,2978 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Energía Chávez | Dashboard Energético</title>
+<title>Energía Refristore | Análisis Energético y Financiero</title>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
 
 <style>
 :root{
-  --azul:#102b48;
-  --verde:#078b94;
-  --fondo:#edf3f8;
-  --texto:#18324b;
-  --gris:#687b8c;
+ --navy:#17233f;
+ --navy2:#234a84;
+ --blue:#3977f6;
+ --green:#0ba779;
+ --orange:#f4a527;
+ --pink:#e65ca8;
+ --red:#e05260;
+ --bg:#f2f5fa;
+ --text:#1b2940;
+ --muted:#718198;
+ --border:#e1e8f1;
 }
 *{box-sizing:border-box}
 body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:var(--fondo);
-  color:var(--texto);
+ margin:0;
+ font-family:Segoe UI,Arial,sans-serif;
+ background:var(--bg);
+ color:var(--text);
 }
-header{
-  background:linear-gradient(110deg,#102b48,#087f91);
-  color:white;
-  padding:28px 5%;
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{
+ outline:3px solid #9bc8ff;
 }
-header h1{margin:0;font-size:30px}
-header p{margin:8px 0 0;color:#d9edf1}
-main{max-width:1550px;margin:auto;padding:18px}
-.panel,.kpi{
-  background:white;
-  border-radius:13px;
-  padding:20px;
-  box-shadow:0 3px 15px #102b4810;
+.sidebar{
+ position:fixed;
+ top:0;left:0;bottom:0;
+ width:250px;
+ background:var(--navy);
+ color:#fff;
+ padding:18px 12px;
+ display:flex;
+ flex-direction:column;
+ z-index:20;
 }
-.panel{margin-bottom:16px}
-h2{margin:0 0 17px;font-size:19px}
-.filtros{
-  display:flex;
-  flex-wrap:wrap;
-  gap:15px;
-  align-items:end;
+.brand{
+ display:flex;
+ align-items:center;
+ gap:12px;
+ padding:8px 9px 26px;
 }
-label{
-  display:block;
-  font-size:12px;
-  font-weight:bold;
-  margin-bottom:6px;
+.brand img{
+ width:58px;height:58px;
+ object-fit:contain;
+ background:#fff;
+ padding:5px;
+ border-radius:11px;
 }
-select,input{
-  padding:11px;
-  border:1px solid #ccd8e2;
-  border-radius:7px;
-  background:white;
-  color:var(--texto);
-  max-width:100%;
+.brand strong{font-size:15px;line-height:1.4}
+.brand small{
+ display:block;
+ font-size:10px;
+ color:#b9c9e0;
+ margin-top:5px;
 }
-input[type=number]{width:135px}
-button{
-  padding:11px 17px;
-  border:0;
-  border-radius:7px;
-  background:var(--verde);
-  color:white;
-  cursor:pointer;
+.menu{display:grid;gap:5px}
+.menu button{
+ width:100%;
+ border:0;
+ border-radius:9px;
+ background:transparent;
+ color:#c0cce0;
+ padding:13px;
+ text-align:left;
+ font-size:13px;
 }
+.menu button:hover,.menu button.active{
+ background:#2a4169;
+ color:white;
+}
+.menu button.active{
+ border-left:3px solid #16cba5;
+}
+.profile{
+ margin-top:auto;
+ padding:16px 10px;
+ border-top:1px solid #354969;
+ font-size:11px;
+ line-height:1.8;
+}
+.profile span{color:#bac9df}
+.app{margin-left:250px;min-height:100vh}
+.topbar{
+ background:#fff;
+ border-bottom:1px solid var(--border);
+ padding:16px 25px;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:14px;
+}
+.topbar h2{font-size:17px;margin:0 0 5px}
+.topbar small{color:var(--muted)}
+.top-actions{
+ display:flex;
+ align-items:center;
+ gap:10px;
+ flex-wrap:wrap;
+}
+.btn{
+ background:var(--green);
+ border:0;
+ color:#fff;
+ border-radius:9px;
+ padding:11px 15px;
+ font-size:12px;
+ font-weight:600;
+}
+.btn.blue{background:var(--blue)}
+.btn.light{background:#eaf0fa;color:#315784}
+.content{
+ padding:22px;
+ max-width:1750px;
+ margin:auto;
+}
+.hero{
+ background:linear-gradient(110deg,#17233d,#234e90 72%,#087e92);
+ color:#fff;
+ border-radius:17px;
+ padding:30px;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:24px;
+ margin-bottom:20px;
+}
+.hero-main{
+ display:flex;
+ align-items:center;
+ gap:22px;
+}
+.hero img{
+ width:105px;height:105px;
+ object-fit:contain;
+ background:#fff;
+ border-radius:13px;
+ padding:9px;
+}
+.hero h1{font-size:30px;margin:9px 0}
+.hero p{
+ font-size:13px;
+ line-height:1.7;
+ margin:4px 0;
+ color:#e3edfb;
+}
+.eyebrow{
+ border:1px solid #ffffff40;
+ background:#ffffff20;
+ border-radius:20px;
+ padding:7px 11px;
+ font-size:10px;
+ letter-spacing:1px;
+}
+.author{
+ text-align:right;
+ font-size:12px;
+ line-height:1.8;
+}
+.author strong{display:block;font-size:15px}
+.toolbar,.panel,.kpi{
+ background:#fff;
+ border:1px solid var(--border);
+ border-radius:13px;
+}
+.toolbar{
+ padding:17px;
+ display:flex;
+ align-items:end;
+ gap:14px;
+ flex-wrap:wrap;
+ margin-bottom:17px;
+}
+.field{
+ display:flex;
+ flex-direction:column;
+ gap:7px;
+}
+.field label{
+ font-size:12px;
+ color:var(--muted);
+ font-weight:600;
+}
+.field select,.field input{
+ border:1px solid #dce5f0;
+ border-radius:8px;
+ background:#fff;
+ color:var(--text);
+ padding:10px;
+ min-width:130px;
+}
+.month-filter{position:relative}
+.month-button{
+ border:1px solid #dce5f0;
+ background:#fff;
+ border-radius:8px;
+ padding:11px 13px;
+ min-width:190px;
+ text-align:left;
+ color:var(--text);
+}
+.month-dropdown{
+ position:absolute;
+ top:calc(100% + 6px);
+ left:0;
+ width:255px;
+ max-height:360px;
+ overflow:auto;
+ background:#fff;
+ border:1px solid var(--border);
+ border-radius:11px;
+ padding:12px;
+ box-shadow:0 12px 30px #15223c25;
+ z-index:100;
+}
+.month-actions{
+ display:flex;
+ gap:8px;
+ margin-bottom:8px;
+}
+.month-actions button{
+ border:0;
+ background:#eaf0f9;
+ border-radius:6px;
+ padding:8px;
+ font-size:11px;
+}
+.month-option{
+ display:flex;
+ align-items:center;
+ gap:10px;
+ padding:8px;
+ font-size:12px;
+ cursor:pointer;
+}
+.month-option input{accent-color:var(--blue)}
+.status{
+ background:#eaf1fa;
+ border-radius:9px;
+ padding:13px 16px;
+ font-size:12px;
+ line-height:1.7;
+ margin-bottom:19px;
+}
+.status.ok{background:#e1f7ec;color:#0c704d}
+.status.warn{background:#fff1d8;color:#865b0c}
+.status.error{background:#ffe5e7;color:#a62638}
+.heading{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:10px;
+ margin:6px 0 15px;
+}
+.heading h2{font-size:19px;margin:0}
+.heading span{color:var(--muted);font-size:12px}
 .kpis{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(185px,1fr));
-  gap:14px;
-  margin-bottom:16px;
+ display:grid;
+ grid-template-columns:repeat(4,minmax(0,1fr));
+ gap:14px;
+ margin-bottom:19px;
 }
-.kpi{border-top:4px solid var(--verde)}
-.kpi small{color:var(--gris)}
+.kpi{padding:19px;min-width:0}
+.kpi-head{
+ display:flex;
+ justify-content:space-between;
+ gap:9px;
+}
+.kpi-head span{
+ font-size:12px;
+ color:var(--muted);
+ line-height:1.5;
+}
+.kpi-head b{
+ font-size:20px;
+ background:#edf3ff;
+ border-radius:8px;
+ padding:6px;
+}
 .kpi strong{
-  display:block;
-  margin-top:12px;
-  font-size:23px;
-  color:var(--verde);
-  overflow-wrap:anywhere;
+ display:block;
+ font-size:23px;
+ margin-top:14px;
+ overflow-wrap:anywhere;
 }
-.graficos{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:16px;
+.kpi p{
+ font-size:11px;
+ line-height:1.6;
+ color:var(--muted);
+ margin:9px 0 0;
 }
-.grafico{height:330px}
-.nota{
-  font-size:13px;
-  color:var(--gris);
-  line-height:1.6;
+.kpi.good{border-left:4px solid var(--green)}
+.kpi.bad{border-left:4px solid var(--red)}
+.kpi.warn{border-left:4px solid var(--orange)}
+.charts{
+ display:grid;
+ grid-template-columns:1.5fr 1fr;
+ gap:17px;
+ margin-bottom:18px;
 }
-.alerta{
-  padding:12px;
-  border-radius:8px;
-  background:#fff3d8;
-  color:#795a16;
-  font-size:13px;
-  line-height:1.5;
+.panel{
+ padding:20px;
+ min-width:0;
+ margin-bottom:18px;
 }
-.tabla{overflow-x:auto}
+.charts .panel{margin-bottom:0}
+.panel h3{font-size:15px;margin:0 0 7px}
+.sub{
+ font-size:12px;
+ color:var(--muted);
+ line-height:1.6;
+ margin:0 0 15px;
+}
+.chart-box{
+ height:330px;
+ position:relative;
+}
+.chart-box canvas{
+ width:100%!important;
+ height:100%!important;
+}
+.wide{grid-column:1/-1}
+.table-wrap{
+ overflow:auto;
+ max-height:540px;
+}
 table{
-  width:100%;
-  border-collapse:collapse;
-  white-space:nowrap;
+ width:100%;
+ border-collapse:collapse;
+ font-size:12px;
 }
 th,td{
-  padding:12px;
-  border-bottom:1px solid #e0e8ee;
-  text-align:right;
+ padding:12px;
+ border-bottom:1px solid var(--border);
+ text-align:right;
+ white-space:nowrap;
 }
+th:first-child,td:first-child{text-align:left}
 th{
-  background:#edf4f8;
-  font-size:13px;
+ background:#f4f7fc;
+ position:sticky;
+ top:0;
+ z-index:1;
 }
-td:first-child,th:first-child{text-align:left}
+tbody tr:hover{background:#f8faff}
+.highlight-cell{
+ background:#e1f7ec!important;
+ color:#08734e;
+ font-weight:700;
+}
+.notice{
+ background:#f1f7ff;
+ border-left:3px solid var(--blue);
+ border-radius:7px;
+ padding:13px 15px;
+ font-size:12px;
+ line-height:1.8;
+}
+.note{
+ font-size:12px;
+ color:var(--muted);
+ line-height:1.8;
+}
+.tariffs{
+ display:grid;
+ grid-template-columns:repeat(5,minmax(0,1fr));
+ gap:12px;
+}
+.tariffs input{width:100%;min-width:0}
+.mix-controls{
+ display:flex;
+ gap:8px;
+ flex-wrap:wrap;
+ margin-bottom:14px;
+}
+.mix-summary{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:10px;
+ margin:13px 0;
+}
+.mix-summary>div{
+ background:#f5f8fd;
+ border:1px solid var(--border);
+ padding:13px;
+ border-radius:9px;
+}
+.mix-summary span{
+ display:block;
+ font-size:11px;
+ color:var(--muted);
+ margin-bottom:7px;
+}
+.mix-summary strong{font-size:17px}
+.mix-legend{display:grid;gap:12px;margin:16px 0}
+.mix-legend-row{
+ display:flex;
+ justify-content:space-between;
+ gap:10px;
+ font-size:12px;
+}
+.mix-legend-name{
+ display:flex;
+ gap:8px;
+ align-items:center;
+ line-height:1.5;
+}
+.dot{
+ width:11px;height:11px;
+ border-radius:50%;
+ display:inline-block;
+ flex-shrink:0;
+}
+.mix-bar{
+ height:7px;
+ background:#edf2f8;
+ border-radius:10px;
+ overflow:hidden;
+ margin-top:5px;
+}
+.mix-fill{height:100%;border-radius:10px}
+.mix-chart{height:280px;position:relative}
+.mix-chart canvas{
+ width:100%!important;
+ height:100%!important;
+}
+.financial-details{
+ margin-top:16px;
+ padding:15px;
+ background:#f5f8fc;
+ border-radius:10px;
+}
+.financial-detail-row{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:12px;
+ padding:11px 0;
+ border-bottom:1px solid #e2e8f1;
+ font-size:12px;
+}
+.financial-detail-row:last-child{border-bottom:0}
+.financial-detail-row strong{
+ color:#18385d;
+ font-size:14px;
+}
+.financial-total{
+ margin-top:13px;
+ padding:15px;
+ border-radius:10px;
+ background:#1d3761;
+ color:white;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:12px;
+}
+.financial-total strong{
+ font-size:21px;
+ color:#fff;
+}
+.financial-insights{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:14px;
+ margin-top:16px;
+}
+.financial-insight{
+ background:#f5f8fd;
+ border:1px solid #e0e8f2;
+ border-left:4px solid var(--blue);
+ border-radius:11px;
+ padding:17px;
+}
+.financial-insight h4{
+ margin:0 0 10px;
+ font-size:13px;
+ color:#193454;
+}
+.financial-insight p{
+ margin:0;
+ font-size:12px;
+ line-height:1.8;
+ color:#52647c;
+}
+.financial-insight.saving{
+ border-left-color:var(--green);
+ background:#f0faf6;
+}
+.financial-insight.warning{
+ border-left-color:var(--orange);
+ background:#fffaf0;
+}
+.financial-insight.danger{
+ border-left-color:var(--red);
+ background:#fff3f4;
+}
+pre{
+ white-space:pre-wrap;
+ overflow-wrap:anywhere;
+ font-size:12px;
+}
+.hidden{display:none!important}
 footer{
-  padding:25px;
-  text-align:center;
-  color:var(--gris);
+ text-align:center;
+ padding:28px;
+ color:#8190a7;
+ font-size:12px;
+ line-height:1.9;
 }
-@media(max-width:800px){
-  .graficos{grid-template-columns:1fr}
-  header h1{font-size:25px}
-  main{padding:10px}
+@media(max-width:1150px){
+ .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .charts{grid-template-columns:1fr}
+ .tariffs{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .hero{flex-direction:column;align-items:flex-start}
+ .author{text-align:left}
+}
+@media(max-width:760px){
+ .sidebar{position:static;width:100%;padding:10px}
+ .brand{padding:8px}
+ .menu{display:flex;overflow-x:auto}
+ .menu button{
+  white-space:nowrap;
+  width:auto;
+  flex-shrink:0;
+ }
+ .profile{display:none}
+ .app{margin-left:0}
+ .content{padding:12px}
+ .topbar{
+  padding:14px;
+  flex-direction:column;
+  align-items:flex-start;
+ }
+ .hero{padding:20px}
+ .hero-main{flex-direction:column;align-items:flex-start}
+ .hero h1{font-size:25px}
+ .kpis{grid-template-columns:1fr 1fr;gap:10px}
+ .kpi{padding:13px}
+ .kpi strong{font-size:19px}
+ .tariffs{grid-template-columns:1fr 1fr}
+ .financial-insights{grid-template-columns:1fr}
+}
+@media print{
+ .sidebar,.topbar,.toolbar,.btn{display:none!important}
+ .app{margin-left:0}
+ .content{padding:0}
+ body{background:white}
+ .panel,.kpi{break-inside:avoid}
 }
 </style>
 </head>
 
 <body>
-<header>
-  <h1>⚡ ENERGÍA CHÁVEZ</h1>
-  <p>Plataforma pública de análisis energético y facturación</p>
+
+<aside class="sidebar">
+ <div class="brand">
+  <img src="Refris.png" alt="Logo Refristore">
+  <div>
+   <strong>ENERGÍA<br>REFRISTORE</strong>
+   <small>INTELIGENCIA ENERGÉTICA</small>
+  </div>
+ </div>
+
+ <nav class="menu" id="menu">
+  <button class="active" data-page="dashboard">▦ &nbsp; Dashboard ejecutivo</button>
+  <button data-page="energia">⚡ &nbsp; Energía activa CNEL</button>
+  <button data-page="demanda">◈ &nbsp; Demandas máximas</button>
+  <button data-page="fp">◉ &nbsp; Factor de potencia</button>
+  <button data-page="finanzas">＄ &nbsp; Análisis financiero</button>
+  <button data-page="detalle">☷ &nbsp; Detalle de consumos</button>
+  <button data-page="config">⚙ &nbsp; Configuración</button>
+ </nav>
+
+ <div class="profile">
+  <strong>Sergio Marcelo Chávez González</strong><br>
+  <span>
+   Ingeniero Eléctrico<br>
+   Energía | Auditoría | Mantenimiento<br>
+   Tel.: 0967417182<br>
+   Dashboard desarrollado por Sergio Chávez
+  </span>
+ </div>
+</aside>
+
+<div class="app">
+
+<header class="topbar">
+ <div>
+  <h2 id="pageTitle">Dashboard ejecutivo</h2>
+  <small>Refristore · Gestión energética y financiera</small>
+ </div>
+ <div class="top-actions">
+  <span id="fileName" style="font-size:12px;color:#75849a">
+   Sin Excel cargado
+  </span>
+  <button class="btn blue" id="printButton">Imprimir reporte</button>
+  <button class="btn" id="uploadButton">＋ Adjuntar Excel</button>
+  <input id="excel" type="file" accept=".xlsx,.xls" hidden>
+ </div>
 </header>
 
-<main>
+<main class="content">
 
-<section class="panel">
-<h2>1. Consulta de información energética</h2>
-
-<div class="filtros">
+<section class="hero">
+ <div class="hero-main">
+  <img src="Refris.png" alt="Refristore">
   <div>
-    <label>Año</label>
-    <select id="anio">
-      <option value="todos">Todos</option>
-    </select>
+   <span class="eyebrow">DASHBOARD EJECUTIVO · GESTIÓN ENERGÉTICA</span>
+   <h1>ENERGÍA REFRISTORE</h1>
+   <p>Análisis Energético y Financiero</p>
+   <p>Consumos · Demandas · Factor de Potencia · Costos CNEL</p>
+   <p>Información estratégica para decisiones gerenciales.</p>
   </div>
+ </div>
+ <div class="author">
+  <strong>Sergio Marcelo Chávez González</strong>
+  Ingeniero Eléctrico<br>
+  Energía | Auditoría | Mantenimiento<br>
+  Tel.: 0967417182<br>
+  Análisis Energético · By Sergio Chávez
+ </div>
+</section>
 
-  <div>
-    <label>Mes</label>
-    <select id="mes">
-      <option value="todos">Todos</option>
-    </select>
-  </div>
+<div class="toolbar">
+ <div class="field">
+  <label for="year">Año</label>
+  <select id="year">
+   <option value="all">Todos</option>
+  </select>
+ </div>
 
-  <div>
-    <label>Indicador principal</label>
-    <select id="indicador">
-      <option value="total">Consumo total (kWh)</option>
-      <option value="a">Consumo A (kWh)</option>
-      <option value="b">Consumo B (kWh)</option>
-      <option value="nocturno">Registro nocturno (kWh)</option>
-      <option value="findesemana">Sábados, domingos y feriados (kWh)</option>
-      <option value="demanda">Demanda máxima (kW)</option>
-      <option value="fp">Factor de potencia</option>
-    </select>
+ <div class="field">
+  <label>Meses (selección múltiple)</label>
+  <div class="month-filter">
+   <button type="button" id="monthButton" class="month-button">
+    Todos los meses ▾
+   </button>
+   <div id="monthDropdown" class="month-dropdown hidden">
+    <div class="month-actions">
+     <button type="button" id="selectAllMonths">Todos</button>
+     <button type="button" id="clearMonths">Limpiar</button>
+    </div>
+    <div id="monthOptions"></div>
+   </div>
   </div>
+ </div>
 
-  <div>
-    <label>Tipo de gráfico</label>
-    <select id="tipo">
-      <option value="bar">Barras</option>
-      <option value="line">Líneas</option>
-    </select>
-  </div>
+ <div class="field">
+  <label for="period">Visualización</label>
+  <select id="period">
+   <option value="month">Mensual</option>
+   <option value="week">Semanal</option>
+   <option value="day">Diaria</option>
+  </select>
+ </div>
+
+ <button class="btn light" id="reset">Restablecer filtros</button>
 </div>
 
-<p id="estado" class="nota">
-  Cargando base de consumos energéticos...
-</p>
-</section>
-
-<section class="kpis" id="kpis"></section>
-
-<section class="graficos">
-  <div class="panel">
-    <h2 id="tituloPrincipal">Consumo energético</h2>
-    <div class="grafico"><canvas id="graficoPrincipal"></canvas></div>
-  </div>
-
-  <div class="panel">
-    <h2>Consumos por registros</h2>
-    <div class="grafico"><canvas id="graficoFranjas"></canvas></div>
-  </div>
-
-  <div class="panel">
-    <h2>Demanda máxima mensual</h2>
-    <div class="grafico"><canvas id="graficoDemanda"></canvas></div>
-  </div>
-
-  <div class="panel">
-    <h2>Factor de potencia mensual</h2>
-    <div class="grafico"><canvas id="graficoFP"></canvas></div>
-  </div>
-</section>
-
-<section class="panel">
-<h2>2. Tarifas y parámetros de facturación</h2>
-
-<p class="nota">
-  Las tarifas iniciales son referencias calculadas a partir
-  de una factura CNEL de septiembre de 2026.
-  Deben revisarse para cada período.
-</p>
-
-<div class="filtros">
-  <div><label>Tarifa A USD/kWh</label>
-    <input id="ta" type="number" step="0.00001" value="0.1178">
-  </div>
-  <div><label>Tarifa B USD/kWh</label>
-    <input id="tb" type="number" step="0.00001" value="0.1318">
-  </div>
-  <div><label>Tarifa C USD/kWh</label>
-    <input id="tc" type="number" step="0.00001" value="0.1001">
-  </div>
-  <div><label>Tarifa D USD/kWh</label>
-    <input id="td" type="number" step="0.00001" value="0.1178">
-  </div>
-  <div><label>Demanda USD/kW</label>
-    <input id="tkw" type="number" step="0.000001" value="4.575993">
-  </div>
-  <div><label>Franja D kWh (factura)</label>
-    <input id="d" type="number" min="0" step="1" placeholder="Ingresar">
-  </div>
-  <div><label>Descuento AGP USD</label>
-    <input id="agp" type="number" step="0.01" value="0">
-  </div>
-  <div><label>Comercialización USD</label>
-    <input id="com" type="number" step="0.01" value="1.41">
-  </div>
-  <div><label>Alumbrado USD</label>
-    <input id="alumbrado" type="number" step="0.01" value="0">
-  </div>
-  <div><label>Penalización FP USD</label>
-    <input id="multa" type="number" step="0.01" value="0">
-  </div>
-  <div><label>Otros cargos netos USD</label>
-    <input id="otros" type="number" step="0.01" value="0">
-  </div>
+<div id="status" class="status">
+ Adjunta tu archivo Excel. Los datos se procesan localmente en el navegador.
 </div>
 
-<p class="alerta">
-  El registro 5KWH corresponde a toda la energía de sábados,
-  domingos y feriados; no equivale exclusivamente a la franja D.
-  La franja D debe obtenerse de la factura o de registros horarios.
-  El costo total se mostrará como pendiente mientras falte ese dato.
-  La penalización de factor de potencia se ingresa manualmente.
-</p>
-</section>
+<!-- DASHBOARD EJECUTIVO -->
 
-<section class="graficos">
+<section data-view="dashboard">
+
+ <div class="heading">
+  <h2>Resumen ejecutivo</h2>
+  <span>Indicadores eléctricos y financieros</span>
+ </div>
+
+ <div class="kpis" id="executiveKpis"></div>
+
+ <div class="charts">
+
   <div class="panel">
-    <h2>Costos estimados por franja</h2>
-    <div class="grafico"><canvas id="graficoCostos"></canvas></div>
+   <h3>Evolución del consumo eléctrico</h3>
+   <p class="sub">Energía activa total por período</p>
+   <div class="chart-box">
+    <canvas id="chartConsumption"></canvas>
+   </div>
   </div>
 
   <div class="panel">
-    <h2>Distribución energética del período</h2>
-    <div class="grafico"><canvas id="graficoDistribucion"></canvas></div>
+   <h3>Distribución de energía y costos CNEL</h3>
+   <p class="sub">Participación de los horarios tarifarios</p>
+
+   <div class="mix-controls">
+    <button class="btn blue" id="mixEnergyBtn">Energía (kWh)</button>
+    <button class="btn light" id="mixCostBtn">Costos (USD)</button>
+   </div>
+
+   <div class="mix-chart">
+    <canvas id="chartMix"></canvas>
+   </div>
+
+   <div class="mix-summary">
+    <div>
+     <span>Energía total</span>
+     <strong id="mixTotalEnergy">—</strong>
+    </div>
+    <div>
+     <span>Costo de energía</span>
+     <strong id="mixTotalCost">—</strong>
+    </div>
+   </div>
+
+   <div id="mixLegend" class="mix-legend"></div>
+
+   <div class="table-wrap">
+    <table id="mixDetails"></table>
+   </div>
+
+   <div id="mixInsight" class="notice" style="margin-top:15px">
+    Adjunta tu Excel para analizar los horarios.
+   </div>
   </div>
+
+  <div class="panel">
+   <h3>Comportamiento del costo eléctrico</h3>
+   <p class="sub">Energía activa y demanda mensual</p>
+   <div class="chart-box">
+    <canvas id="chartCost"></canvas>
+   </div>
+  </div>
+
+  <div class="panel">
+   <h3>Demandas máximas por horarios CNEL</h3>
+   <p class="sub">
+    Comparación de las cuatro demandas horarias.
+    Se destaca automáticamente la máxima.
+   </p>
+   <div class="chart-box">
+    <canvas id="chartDemand"></canvas>
+   </div>
+   <div id="demandMaxInfo" class="notice" style="margin-top:15px">
+    Esperando lecturas de demanda.
+   </div>
+   <div class="table-wrap" style="margin-top:15px">
+    <table id="demandScheduleTable"></table>
+   </div>
+  </div>
+
+  <div class="panel wide">
+   <h3>Factor de potencia · Control de eficiencia</h3>
+   <p class="sub">Referencia mínima: 0,94</p>
+   <div class="chart-box">
+    <canvas id="chartFP"></canvas>
+   </div>
+  </div>
+
+ </div>
+
+ <div class="panel">
+  <h3>Resumen financiero mensual</h3>
+  <p class="sub">
+   Consumos, demandas máximas y costos de los meses seleccionados
+  </p>
+  <div class="table-wrap">
+   <table id="executiveTable"></table>
+  </div>
+ </div>
+
+ <div class="notice">
+  Los costos son estimaciones basadas en las tarifas configuradas.
+  El período mensual corresponde al calendario y puede diferir
+  del corte real de facturación CNEL.
+ </div>
+
 </section>
 
-<section class="panel">
-<h2>3. Resumen de facturación</h2>
-<p id="conciliacion" class="nota"></p>
-<div class="tabla">
-<table>
-<thead>
-<tr>
-  <th>Concepto</th>
-  <th>Cantidad</th>
-  <th>Valor USD</th>
-</tr>
-</thead>
-<tbody id="facturacion"></tbody>
-</table>
-</div>
+<!-- ENERGÍA -->
+
+<section data-view="energia" class="hidden">
+
+ <div class="heading">
+  <h2>Energía activa por horario CNEL</h2>
+ </div>
+
+ <div class="kpis" id="energyKpis"></div>
+
+ <div class="panel">
+  <h3>Consumo eléctrico por horario tarifario</h3>
+  <div class="chart-box">
+   <canvas id="chartBands"></canvas>
+  </div>
+ </div>
+
+ <div class="panel">
+  <h3>Detalle de energía y costos</h3>
+  <div class="table-wrap">
+   <table id="energyTable"></table>
+  </div>
+ </div>
+
 </section>
 
-<section class="panel">
-<h2>4. Histórico de consumos y demandas</h2>
-<div class="tabla">
-<table>
-<thead>
-<tr>
-  <th>Mes</th>
-  <th>Total kWh</th>
-  <th>A kWh</th>
-  <th>B kWh</th>
-  <th>Nocturno kWh</th>
-  <th>S/D/F kWh</th>
-  <th>Demanda kW</th>
-  <th>FP</th>
-  <th>Alertas</th>
-</tr>
-</thead>
-<tbody id="historico"></tbody>
-</table>
-</div>
+<!-- DEMANDA -->
+
+<section data-view="demanda" class="hidden">
+
+ <div class="heading">
+  <h2>Análisis de demandas máximas</h2>
+  <span>Factor multiplicador ×350</span>
+ </div>
+
+ <div class="kpis" id="demandKpis"></div>
+
+ <div class="panel">
+  <h3>Demandas máximas por horario y período</h3>
+  <p class="sub">
+   6KW, 7KW, 8KW y 9KW.
+   La barra más alta se resalta automáticamente.
+  </p>
+  <div class="chart-box">
+   <canvas id="chartDemandDetail"></canvas>
+  </div>
+ </div>
+
+ <div class="panel">
+  <h3>Demanda máxima facturable por mes</h3>
+  <p class="sub">Mayor demanda de cada mes, aplicada una sola vez</p>
+  <div class="chart-box">
+   <canvas id="chartMonthlyDemand"></canvas>
+  </div>
+ </div>
+
+ <div class="panel">
+  <h3>Comparación de demandas por horario</h3>
+  <div class="table-wrap">
+   <table id="demandTable"></table>
+  </div>
+ </div>
+
+</section>
+
+<!-- FACTOR DE POTENCIA -->
+
+<section data-view="fp" class="hidden">
+
+ <div class="heading">
+  <h2>Factor de potencia</h2>
+  <span>Referencia mínima 0,9400</span>
+ </div>
+
+ <div class="kpis" id="fpKpis"></div>
+
+ <div class="panel">
+  <h3>Evolución del factor de potencia</h3>
+  <div class="chart-box">
+   <canvas id="chartFPDetail"></canvas>
+  </div>
+ </div>
+
+ <div class="panel">
+  <h3>Evaluación técnica</h3>
+  <p id="fpObservation" class="note">
+   Esperando lecturas.
+  </p>
+ </div>
+
+</section>
+
+<!-- FINANZAS -->
+
+<section data-view="finanzas" class="hidden">
+
+ <div class="heading">
+  <h2>Análisis financiero</h2>
+  <span>Costos eléctricos estimados</span>
+ </div>
+
+ <div class="kpis" id="financeKpis"></div>
+
+ <div class="charts">
+
+  <div class="panel">
+   <h3>Composición del costo eléctrico</h3>
+   <p class="sub">Participación de energía activa y demanda</p>
+   <div class="chart-box">
+    <canvas id="chartFinanceMix"></canvas>
+   </div>
+   <div id="financialCompositionDetails" class="financial-details"></div>
+  </div>
+
+  <div class="panel">
+   <h3>Costo de energía por horario CNEL</h3>
+   <p class="sub">Valores en USD y participación porcentual</p>
+   <div class="chart-box">
+    <canvas id="chartBandCosts"></canvas>
+   </div>
+   <div id="financialBandsDetails" class="financial-details"></div>
+  </div>
+
+ </div>
+
+ <div class="panel">
+  <h3>Análisis gerencial y oportunidades de optimización</h3>
+  <p class="sub">
+   Comentarios generados a partir de los consumos,
+   tarifas y demandas registradas.
+  </p>
+  <div id="financialRecommendations" class="financial-insights"></div>
+ </div>
+
+ <div class="panel">
+  <h3>Facturación mensual estimada</h3>
+  <div class="table-wrap">
+   <table id="financeTable"></table>
+  </div>
+  <p class="note">
+   No incluye descuentos, impuestos, comercialización,
+   alumbrado público ni otros cargos de CNEL.
+  </p>
+ </div>
+
+</section>
+
+<!-- DETALLE -->
+
+<section data-view="detalle" class="hidden">
+
+ <div class="panel">
+  <h3>Resumen semanal</h3>
+  <div class="table-wrap">
+   <table id="weeklyTable"></table>
+  </div>
+ </div>
+
+ <div class="panel">
+  <h3>Resumen diario</h3>
+  <div class="table-wrap">
+   <table id="dailyTable"></table>
+  </div>
+ </div>
+
+</section>
+
+<!-- CONFIGURACIÓN -->
+
+<section data-view="config" class="hidden">
+
+ <div class="panel">
+  <h3>Tarifas eléctricas configurables</h3>
+
+  <div class="tariffs">
+
+   <div class="field">
+    <label>Energía act. hor. A ($/kWh)</label>
+    <input id="rateA" type="number" min="0" step=".0001" value=".1178">
+   </div>
+
+   <div class="field">
+    <label>Energía act. hor. B ($/kWh)</label>
+    <input id="rateB" type="number" min="0" step=".0001" value=".1318">
+   </div>
+
+   <div class="field">
+    <label>Energía act. hor. C ($/kWh)</label>
+    <input id="rateC" type="number" min="0" step=".0001" value=".1001">
+   </div>
+
+   <div class="field">
+    <label>Energía act. hor. D ($/kWh)</label>
+    <input id="rateD" type="number" min="0" step=".0001" value=".1178">
+   </div>
+
+   <div class="field">
+    <label>Demanda ($/kW)</label>
+    <input id="rateDemand" type="number" min="0" step=".0001" value="4.576">
+   </div>
+
+  </div>
+
+  <p class="note">
+   Multiplicador de energía y demanda: 350.
+   Referencia mínima de factor de potencia: 0,94.
+  </p>
+ </div>
+
+ <div class="panel">
+  <h3>Diagnóstico de datos importados</h3>
+  <pre id="diagnostic">Esperando Excel...</pre>
+ </div>
+
 </section>
 
 </main>
 
 <footer>
-© 2026 Energía Chávez · Plataforma de análisis energético
+ <strong>ENERGÍA REFRISTORE</strong> · Dashboard Ejecutivo<br>
+ Sergio Marcelo Chávez González · Ingeniero Eléctrico<br>
+ Energía | Auditoría | Mantenimiento · Tel.: 0967417182<br>
+ Análisis Energético · By Sergio Chávez · © 2026
 </footer>
 
-<script>
-const MULTIPLICADOR = 350;
-const $ = id => document.getElementById(id);
+</div>
 
-const meses = [
-  "Enero","Febrero","Marzo","Abril","Mayo","Junio",
-  "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
+<script>
+"use strict";
+
+// =======================================
+// CONFIGURACIÓN
+// =======================================
+
+const FACTOR=350;
+const FP_MIN=0.94;
+
+const COLORS=[
+ "#3977f6",
+ "#0ba779",
+ "#f4a527",
+ "#e65ca8"
 ];
 
-let lecturas = [];
-let graficos = {};
+const ENERGY_LABELS=[
+ "Energía act. hor. A (L-V 08h00-18h00)",
+ "Energía act. hor. B (L-V 18h00-22h00)",
+ "Energía act. hor. C (L-V 22h00-08h00 S,D,F 22h00-18h00)",
+ "Energía act. hor. D (S,D,F 18h00-22h00)"
+];
 
-function normalizar(texto){
-  return String(texto ?? "")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g,"")
-    .replace(/[^a-z0-9]/g,"");
+const DEMAND_LABELS=[
+ "Demanda máx. hor. A (L-V 08h00-18h00)",
+ "Demanda máx. hor. B (L-V 18h00-22h00)",
+ "Demanda máx. hor. C (L-V 22h00-08h00 S,D,F 22h00-18h00)",
+ "Demanda máx. hor. D (S,D,F 18h00-22h00)"
+];
+
+const SHORT_DEMAND=[
+ "A · 08h00-18h00",
+ "B · 18h00-22h00",
+ "C · Nocturno",
+ "D · S,D,F 18h00-22h00"
+];
+
+const MONTHS=[
+ "Enero","Febrero","Marzo","Abril",
+ "Mayo","Junio","Julio","Agosto",
+ "Septiembre","Octubre","Noviembre","Diciembre"
+];
+
+const $=id=>document.getElementById(id);
+
+const nf=n=>new Intl.NumberFormat("es-EC",{
+ maximumFractionDigits:2
+}).format(n);
+
+const money=n=>new Intl.NumberFormat("es-EC",{
+ style:"currency",
+ currency:"USD"
+}).format(n);
+
+const percent=n=>Number(n).toFixed(2)+"%";
+
+let readings=[];
+let intervals=[];
+let charts={};
+let quality={};
+let mixMode="energy";
+let mixData=null;
+
+const selectedMonths=new Set();
+
+// =======================================
+// UTILIDADES
+// =======================================
+
+function normalize(v){
+ return String(v??"")
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g,"")
+  .toUpperCase()
+  .replace(/[^A-Z0-9]/g,"");
 }
 
-function campo(fila,nombre){
-  const clave = Object.keys(fila).find(
-    k => normalizar(k) === normalizar(nombre)
+function num(v){
+ if(typeof v==="number"){
+  return Number.isFinite(v)?v:null;
+ }
+
+ if(v===null||v===undefined)return null;
+
+ let s=String(v).trim().replace(/\s/g,"");
+ if(!s||s==="-")return null;
+
+ if(s.includes(",")&&s.includes(".")){
+  s=s.lastIndexOf(",")>s.lastIndexOf(".")
+   ?s.replace(/\./g,"").replace(",",".")
+   :s.replace(/,/g,"");
+ }else{
+  s=s.replace(",",".");
+ }
+
+ const n=Number(s);
+ return Number.isFinite(n)?n:null;
+}
+
+function validDate(y,m,d){
+ const x=new Date(y,m-1,d);
+ return x.getFullYear()===y&&
+  x.getMonth()===m-1&&
+  x.getDate()===d&&
+  y>=2000&&y<=2100?x:null;
+}
+
+function readDate(v){
+
+ if(v instanceof Date&&!isNaN(v)){
+  return validDate(
+   v.getFullYear(),
+   v.getMonth()+1,
+   v.getDate()
   );
-  return clave === undefined ? null : fila[clave];
+ }
+
+ if(typeof v==="number"){
+  const d=XLSX.SSF.parse_date_code(v);
+  return d?validDate(d.y,d.m,d.d):null;
+ }
+
+ const s=String(v??"").trim();
+
+ let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+ if(m)return validDate(+m[1],+m[2],+m[3]);
+
+ m=s.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})/);
+ return m?validDate(+m[3],+m[2],+m[1]):null;
 }
 
-function numero(valor){
-  if(typeof valor === "number")
-    return Number.isFinite(valor) ? valor : null;
+function dateKey(d){
+ return d.getFullYear()+"-"+
+  String(d.getMonth()+1).padStart(2,"0")+"-"+
+  String(d.getDate()).padStart(2,"0");
+}
 
-  if(valor === null || valor === undefined || String(valor).trim()==="")
-    return null;
+function weekKey(d){
+ const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+ x.setDate(x.getDate()-(x.getDay()+6)%7);
+ return dateKey(x);
+}
 
-  let s = String(valor).trim().replace(/\s/g,"");
+function getRates(){
+ return [
+  "rateA","rateB","rateC","rateD","rateDemand"
+ ].map(id=>Math.max(0,num($(id).value)??0));
+}
 
-  if(s.includes(",") && s.includes(".")){
-    s = s.lastIndexOf(",") > s.lastIndexOf(".")
-      ? s.replace(/\./g,"").replace(",",".")
-      : s.replace(/,/g,"");
-  }else{
-    s = s.replace(",",".");
+function status(message,type=""){
+ $("status").className="status "+type;
+ $("status").textContent=message;
+}
+
+function maxValid(values){
+ const valid=values.filter(v=>
+  v!==null&&Number.isFinite(v)&&v>=0
+ );
+ return valid.length?Math.max(...valid):null;
+}
+
+// =======================================
+// FILTRO MULTIMES
+// =======================================
+
+function updateMonthButton(){
+ const count=selectedMonths.size;
+
+ $("monthButton").textContent=
+  count===0||count===12
+   ?"Todos los meses ▾"
+   :count===1
+    ?MONTHS[[...selectedMonths][0]-1]+" ▾"
+    :count+" meses seleccionados ▾";
+}
+
+function buildMonthOptions(){
+ const container=$("monthOptions");
+ container.replaceChildren();
+
+ MONTHS.forEach((month,index)=>{
+  const number=index+1;
+  const label=document.createElement("label");
+  label.className="month-option";
+
+  const checkbox=document.createElement("input");
+  checkbox.type="checkbox";
+  checkbox.checked=selectedMonths.has(number);
+
+  checkbox.addEventListener("change",()=>{
+   if(checkbox.checked)selectedMonths.add(number);
+   else selectedMonths.delete(number);
+
+   updateMonthButton();
+   render();
+  });
+
+  label.append(checkbox,document.createTextNode(month));
+  container.append(label);
+ });
+}
+
+$("monthButton").addEventListener("click",()=>{
+ $("monthDropdown").classList.toggle("hidden");
+});
+
+$("selectAllMonths").addEventListener("click",()=>{
+ selectedMonths.clear();
+ buildMonthOptions();
+ updateMonthButton();
+ render();
+});
+
+$("clearMonths").addEventListener("click",()=>{
+ selectedMonths.clear();
+ buildMonthOptions();
+ updateMonthButton();
+ render();
+});
+
+document.addEventListener("click",event=>{
+ if(!event.target.closest(".month-filter")){
+  $("monthDropdown").classList.add("hidden");
+ }
+});
+
+// =======================================
+// IMPORTACIÓN EXCEL
+// =======================================
+
+function importWorkbook(wb){
+
+ let best=null;
+
+ const patterns=[
+  "2KWH","3KWH","4KWH","5KWH",
+  "6KW","7KW","8KW","9KW","12FECHA"
+ ];
+
+ for(const name of wb.SheetNames){
+
+  const rows=XLSX.utils.sheet_to_json(
+   wb.Sheets[name],
+   {header:1,defval:null,raw:true}
+  );
+
+  for(let i=0;i<Math.min(rows.length,40);i++){
+
+   const headers=rows[i].map(normalize);
+
+   const score=patterns.filter(x=>
+    headers.includes(x)
+   ).length;
+
+   if(!best||score>best.score){
+    best={name,rows,i,headers,score};
+   }
+  }
+ }
+
+ if(!best||best.score<5){
+  throw Error(
+   "No se encontraron las columnas eléctricas esperadas."
+  );
+ }
+
+ const find=(...names)=>
+  best.headers.findIndex(h=>names.includes(h));
+
+ const col={
+  date:find("12FECHA","FECHA"),
+  total:find("1KWH"),
+  reactive:find("10KVARH"),
+  fp:find("FP"),
+  bands:[2,3,4,5].map(n=>find(n+"KWH")),
+  demands:[6,7,8,9].map(n=>
+   find(n+"KW",n+"KWA")
+  )
+ };
+
+ if(col.date<0||col.bands.some(i=>i<0)){
+  throw Error("Faltan FECHA o columnas 2KWH a 5KWH.");
+ }
+
+ const rows=best.rows.slice(best.i+1)
+  .map((v,i)=>({v,i,date:readDate(v[col.date])}))
+  .filter(r=>r.date)
+  .sort((a,b)=>a.date-b.date||a.i-b.i);
+
+ const unique=[];
+ let duplicates=0;
+
+ for(const r of rows){
+
+  if(unique.length&&
+   dateKey(unique.at(-1).date)===dateKey(r.date)){
+   duplicates++;
+   continue;
   }
 
-  const n = Number(s);
-  return Number.isFinite(n) ? n : null;
-}
+  unique.push(r);
+ }
 
-function fecha(valor){
-  if(valor instanceof Date)
-    return isNaN(valor.getTime()) ? null : valor;
+ readings=unique.map(r=>{
 
-  if(typeof valor === "number"){
-    const f = XLSX.SSF.parse_date_code(valor);
-    return f ? new Date(f.y,f.m-1,f.d) : null;
+  const demandBands=col.demands.map(i=>
+   i<0?null:num(r.v[i])
+  ).map(v=>v!==null&&v>=0?v*FACTOR:null);
+
+  const fp=num(r.v[col.fp]);
+
+  return{
+   date:r.date,
+   bands:col.bands.map(i=>num(r.v[i])),
+   total:col.total<0?null:num(r.v[col.total]),
+   reactive:col.reactive<0?null:num(r.v[col.reactive]),
+   fp:fp!==null&&fp>=0&&fp<=1?fp:null,
+   demandBands,
+   demand:maxValid(demandBands)
+  };
+ });
+
+ intervals=[];
+
+ let gaps=0;
+ let invalid=0;
+ let mismatches=0;
+
+ for(let i=1;i<readings.length;i++){
+
+  const previous=readings[i-1];
+  const current=readings[i];
+
+  const days=Math.round(
+   (current.date-previous.date)/86400000
+  );
+
+  if(days!==1){
+   gaps++;
+   continue;
   }
 
-  const s = String(valor ?? "").trim();
-  const m = s.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})/);
+  const bands=current.bands.map((v,j)=>
+   v===null||previous.bands[j]===null
+    ?null:(v-previous.bands[j])*FACTOR
+  );
 
-  if(m) return new Date(+m[3],+m[2]-1,+m[1]);
+  const total=current.total===null||
+   previous.total===null
+    ?null:(current.total-previous.total)*FACTOR;
 
-  const f = new Date(s);
-  return isNaN(f.getTime()) ? null : f;
+  if(bands.some(v=>v===null||v<0)||
+   (total!==null&&total<0)){
+   invalid++;
+   continue;
+  }
+
+  const sum=bands.reduce((a,b)=>a+b,0);
+
+  if(total!==null&&
+   Math.abs(total-sum)>Math.max(350,total*.03)){
+   mismatches++;
+  }
+
+  const reactive=
+   current.reactive===null||
+   previous.reactive===null
+    ?null:
+    (current.reactive-previous.reactive)*FACTOR;
+
+  intervals.push({
+   date:current.date,
+   bands,total,
+   reactive:reactive!==null&&reactive>=0
+    ?reactive:null,
+   demand:current.demand,
+   demandBands:current.demandBands,
+   fp:current.fp
+  });
+ }
+
+ quality={
+  hoja:best.name,
+  filaEncabezados:best.i+1,
+  lecturas:readings.length,
+  intervalosValidos:intervals.length,
+  fechasDuplicadas:duplicates,
+  saltosDeFecha:gaps,
+  intervalosInvalidos:invalid,
+  diferenciasRegistroTotalVsFranjas:mismatches,
+  multiplicador:FACTOR,
+  referenciaFP:FP_MIN,
+  observacion:
+   "Los intervalos con fechas no consecutivas o diferencias negativas se excluyen del consumo."
+ };
+
+ $("diagnostic").textContent=
+  JSON.stringify(quality,null,2);
+
+ buildFilters();
+ render();
+
+ const issues=gaps+invalid+mismatches;
+
+ status(
+  "Excel procesado: "+
+  readings.length+" lecturas, "+
+  intervals.length+" intervalos válidos. "+
+  (issues
+   ?"Se detectaron "+issues+" incidencias. Revisa Configuración."
+   :"Sin incidencias principales detectadas."),
+  issues?"warn":"ok"
+ );
 }
 
-function formato(n,d=0){
-  return n === null || n === undefined
-    ? "—"
-    : Number(n).toLocaleString("es-EC",{
-        minimumFractionDigits:d,
-        maximumFractionDigits:d
-      });
+// =======================================
+// FILTROS
+// =======================================
+
+function buildFilters(){
+ const y=$("year");
+ y.replaceChildren(new Option("Todos","all"));
+
+ [...new Set(readings.map(r=>r.date.getFullYear()))]
+  .sort((a,b)=>b-a)
+  .forEach(v=>y.add(new Option(v,v)));
+
+ selectedMonths.clear();
+ buildMonthOptions();
+ updateMonthButton();
 }
 
-function dinero(n){
-  return n === null || n === undefined
-    ? "Pendiente"
-    : "$" + formato(n,2);
+function matches(d){
+ return(
+  ($("year").value==="all"||
+   d.getFullYear()===Number($("year").value))&&
+  (selectedMonths.size===0||
+   selectedMonths.has(d.getMonth()+1))
+ );
 }
 
-function entrada(id){
-  return numero($(id).value);
-}
+// =======================================
+// AGRUPACIÓN DE DATOS
+// =======================================
 
-function positivo(id){
-  return Math.max(0,entrada(id) ?? 0);
-}
+function aggregate(data,mode,rates){
 
-function crearGrafico(id,tipo,etiquetas,datasets){
-  if(graficos[id]) graficos[id].destroy();
+ const map=new Map();
 
-  graficos[id] = new Chart($(id),{
-    type:tipo,
-    data:{labels:etiquetas,datasets},
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      interaction:{mode:"index",intersect:false},
-      scales:tipo==="doughnut"
-        ? {}
-        : {y:{beginAtZero:tipo==="bar"}}
-    }
+ for(const r of data){
+
+  const key=mode==="day"
+   ?dateKey(r.date)
+   :mode==="week"
+    ?weekKey(r.date)
+    :dateKey(r.date).slice(0,7);
+
+  if(!map.has(key)){
+   map.set(key,{
+    key,
+    bands:[0,0,0,0],
+    demand:null,
+    demandBands:[null,null,null,null],
+    reactive:0,
+    fpSum:0,
+    fpCount:0,
+    fpLow:0
+   });
+  }
+
+  const g=map.get(key);
+
+  r.bands.forEach((v,i)=>{
+   g.bands[i]+=v;
+  });
+
+  if(r.demand!==null){
+   g.demand=g.demand===null
+    ?r.demand:Math.max(g.demand,r.demand);
+  }
+
+  r.demandBands.forEach((v,i)=>{
+   if(v!==null){
+    g.demandBands[i]=
+     g.demandBands[i]===null
+      ?v:Math.max(g.demandBands[i],v);
+   }
+  });
+
+  if(r.reactive!==null)g.reactive+=r.reactive;
+
+  if(r.fp!==null){
+   g.fpSum+=r.fp;
+   g.fpCount++;
+   if(r.fp<FP_MIN)g.fpLow++;
+  }
+ }
+
+ return [...map.values()]
+  .sort((a,b)=>a.key.localeCompare(b.key))
+  .map(g=>{
+
+   g.kwh=g.bands.reduce((a,b)=>a+b,0);
+
+   g.bandCosts=g.bands.map(
+    (v,i)=>v*rates[i]
+   );
+
+   g.energyCost=g.bandCosts.reduce(
+    (a,b)=>a+b,0
+   );
+
+   g.demandCost=
+    mode==="month"&&g.demand!==null
+     ?g.demand*rates[4]
+     :null;
+
+   g.bill=g.demandCost===null
+    ?null:g.energyCost+g.demandCost;
+
+   g.fp=g.fpCount
+    ?g.fpSum/g.fpCount:null;
+
+   return g;
   });
 }
 
-function serie(nombre,datos,color){
-  return {
-    label:nombre,
-    data:datos,
-    backgroundColor:color,
-    borderColor:color,
-    borderWidth:2,
-    tension:0.25
-  };
+// =======================================
+// TARJETAS
+// =======================================
+
+function makeKpi(label,value,description,icon,kind=""){
+
+ const card=document.createElement("div");
+ card.className="kpi "+kind;
+
+ const head=document.createElement("div");
+ head.className="kpi-head";
+
+ const title=document.createElement("span");
+ title.textContent=label;
+
+ const symbol=document.createElement("b");
+ symbol.textContent=icon;
+
+ head.append(title,symbol);
+
+ const valueEl=document.createElement("strong");
+ valueEl.textContent=value;
+
+ const desc=document.createElement("p");
+ desc.textContent=description;
+
+ card.append(head,valueEl,desc);
+ return card;
 }
 
-async function cargarExcel(){
-  try{
-    if(!window.XLSX || !window.Chart)
-      throw new Error("No se pudieron cargar las librerías.");
+function kpis(id,items){
+ $(id).replaceChildren(
+  ...items.map(item=>makeKpi(...item))
+ );
+}
 
-    const respuesta = await fetch("./consumos.xlsx",{
-      cache:"no-store"
-    });
+// =======================================
+// TABLAS
+// =======================================
 
-    if(!respuesta.ok)
-      throw new Error(
-        "No se encontró consumos.xlsx. Súbelo a GitHub."
-      );
+function table(id,headers,rows,highlightFn=null){
 
-    const archivo = await respuesta.arrayBuffer();
+ const element=$(id);
+ element.replaceChildren();
 
-    const libro = XLSX.read(archivo,{
-      type:"array",
-      cellDates:true
-    });
+ const thead=document.createElement("thead");
+ const headRow=document.createElement("tr");
 
-    const hoja = libro.SheetNames.find(
-      n => normalizar(n) === normalizar("BASE REFRISTORE")
+ headers.forEach(h=>{
+  const th=document.createElement("th");
+  th.textContent=h;
+  headRow.append(th);
+ });
+
+ thead.append(headRow);
+ element.append(thead);
+
+ const tbody=document.createElement("tbody");
+
+ rows.forEach((row,ri)=>{
+
+  const tr=document.createElement("tr");
+
+  row.forEach((value,ci)=>{
+   const td=document.createElement("td");
+   td.textContent=value;
+
+   if(highlightFn&&highlightFn(ri,ci)){
+    td.classList.add("highlight-cell");
+   }
+
+   tr.append(td);
+  });
+
+  tbody.append(tr);
+ });
+
+ element.append(tbody);
+}
+
+// =======================================
+// GRÁFICOS
+// =======================================
+
+const financialValueLabels={
+ id:"financialValueLabels",
+ afterDatasetsDraw(chart,unused,options){
+
+  if(!options||!options.enabled)return;
+
+  const ctx=chart.ctx;
+
+  chart.data.datasets.forEach((dataset,di)=>{
+
+   const meta=chart.getDatasetMeta(di);
+
+   meta.data.forEach((element,i)=>{
+
+    const value=Number(dataset.data[i]);
+
+    if(!Number.isFinite(value))return;
+
+    const position=element.tooltipPosition();
+
+    ctx.save();
+    ctx.fillStyle="#193454";
+    ctx.font="bold 11px Segoe UI";
+    ctx.textAlign="center";
+    ctx.textBaseline="bottom";
+
+    ctx.fillText(
+     money(value),
+     position.x,
+     Math.max(chart.chartArea.top+14,position.y-8)
     );
 
-    if(!hoja)
-      throw new Error("No existe la hoja BASE REFRISTORE.");
+    ctx.restore();
+   });
+  });
+ }
+};
 
-    const datos = XLSX.utils.sheet_to_json(
-      libro.Sheets[hoja],{defval:null}
-    );
+const financeCenterLabel={
+ id:"financeCenterLabel",
+ afterDraw(chart,unused,options){
 
-    lecturas = datos.map((r,i)=>({
-      orden:i,
-      fecha:fecha(campo(r,"fecha")),
-      registros:[1,2,3,4,5].map(
-        n=>numero(campo(r,n+"KWH"))
-      ),
-      demanda:numero(campo(r,"kreal fact max")),
-      fp:numero(campo(r,"fp")),
-      energia:[0,0,0,0,0],
-      alertas:0
-    })).filter(r=>r.fecha && !isNaN(r.fecha.getTime()));
+  if(!options||!options.enabled)return;
 
-    lecturas.sort(
-      (a,b)=>a.fecha-b.fecha || a.orden-b.orden
-    );
+  const {ctx,chartArea}=chart;
+  if(!chartArea)return;
 
-    const anteriores = Array(5).fill(null);
+  const x=(chartArea.left+chartArea.right)/2;
+  const y=(chartArea.top+chartArea.bottom)/2;
 
-    for(const r of lecturas){
-      for(let i=0;i<5;i++){
-        const actual = r.registros[i];
+  ctx.save();
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+  ctx.fillStyle="#718198";
+  ctx.font="12px Segoe UI";
+  ctx.fillText("Total estimado",x,y-17);
+  ctx.fillStyle="#1b2940";
+  ctx.font="bold 17px Segoe UI";
+  ctx.fillText(money(options.total||0),x,y+12);
+  ctx.restore();
+ }
+};
 
-        if(actual === null) continue;
+Chart.register(financialValueLabels,financeCenterLabel);
 
-        if(anteriores[i] !== null){
-          const diferencia = actual-anteriores[i];
+function draw(id,type,labels,datasets,stacked=false,extra={}){
 
-          if(diferencia >= 0){
-            r.energia[i] = diferencia*MULTIPLICADOR;
-          }else{
-            r.alertas++;
-          }
-        }
+ if(typeof Chart==="undefined")return;
 
-        anteriores[i] = actual;
+ if(charts[id])charts[id].destroy();
+
+ const circular=type==="doughnut";
+
+ charts[id]=new Chart($(id),{
+  type,
+  data:{labels,datasets},
+  options:{
+   responsive:true,
+   maintainAspectRatio:false,
+   interaction:{mode:"index",intersect:false},
+   layout:{
+    padding:{top:extra.valueLabels?30:0}
+   },
+   plugins:{
+    legend:{
+     position:"bottom",
+     labels:{boxWidth:11,usePointStyle:true}
+    },
+    tooltip:{
+     callbacks:{
+      label(context){
+       const value=Number(context.raw)||0;
+       const formatted=extra.currency
+        ?money(value):nf(value);
+
+       return context.dataset.label
+        ?context.dataset.label+": "+formatted
+        :context.label+": "+formatted;
       }
+     }
+    },
+    financialValueLabels:{
+     enabled:!!extra.valueLabels
+    },
+    financeCenterLabel:{
+     enabled:!!extra.centerTotal,
+     total:extra.centerTotal||0
     }
-
-    const anios = [...new Set(
-      lecturas.map(r=>r.fecha.getFullYear())
-    )].sort();
-
-    $("anio").innerHTML =
-      '<option value="todos">Todos</option>'+
-      anios.map(y=>`<option value="${y}">${y}</option>`).join("");
-
-    $("mes").innerHTML =
-      '<option value="todos">Todos</option>'+
-      meses.map((m,i)=>`<option value="${i}">${m}</option>`).join("");
-
-    $("anio").value = String(anios.at(-1));
-    $("mes").value = "todos";
-
-    actualizar();
-
-  }catch(error){
-    $("estado").textContent = "Error: " + error.message;
+   },
+   scales:circular?{}:{
+    x:{stacked,grid:{display:false}},
+    y:{
+     stacked,
+     beginAtZero:true,
+     grid:{color:"#edf1f7"},
+     ticks:{
+      callback:value=>extra.currency
+       ?money(value):nf(value)
+     }
+    }
+   }
   }
+ });
 }
 
-function agrupar(filas){
-  const energia = Array(5).fill(0);
-  let demanda = null;
-  let sumaFP = 0;
-  let cantidadFP = 0;
-  let alertas = 0;
+// =======================================
+// DEMANDAS MÁXIMAS POR HORARIO
+// =======================================
 
-  for(const r of filas){
-    r.energia.forEach((v,i)=>energia[i]+=v);
+function demandGroups(rows,mode){
 
-    if(r.demanda !== null && r.demanda >= 0){
-      demanda = Math.max(demanda ?? r.demanda,r.demanda);
-    }
+ const map=new Map();
 
-    if(r.fp !== null && r.fp > 0 && r.fp <= 1){
-      sumaFP += r.fp;
-      cantidadFP++;
-    }
+ for(const r of rows){
 
-    alertas += r.alertas;
+  const key=mode==="day"
+   ?dateKey(r.date)
+   :mode==="week"
+    ?weekKey(r.date)
+    :dateKey(r.date).slice(0,7);
+
+  if(!map.has(key)){
+   map.set(key,{
+    key,
+    demandBands:[null,null,null,null]
+   });
   }
 
-  return {
-    energia,
-    demanda,
-    fp:cantidadFP ? sumaFP/cantidadFP : null,
-    alertas,
-    cantidad:filas.length
-  };
+  const g=map.get(key);
+
+  r.demandBands.forEach((v,i)=>{
+   if(v!==null){
+    g.demandBands[i]=
+     g.demandBands[i]===null
+      ?v:Math.max(g.demandBands[i],v);
+   }
+  });
+ }
+
+ return [...map.values()]
+  .sort((a,b)=>a.key.localeCompare(b.key))
+  .map(g=>{
+
+   g.max=maxValid(g.demandBands);
+
+   g.winner=g.max===null
+    ?-1:g.demandBands.indexOf(g.max);
+
+   return g;
+  });
 }
 
-function actualizar(){
-  if(!lecturas.length) return;
+function drawDemandChart(id,groups){
 
-  const anio = $("anio").value;
-  const mes = $("mes").value;
+ if(typeof Chart==="undefined")return;
 
-  const filtradas = lecturas.filter(r=>
-    (anio==="todos" || r.fecha.getFullYear()===+anio) &&
-    (mes==="todos" || r.fecha.getMonth()===+mes)
-  );
+ if(charts[id])charts[id].destroy();
 
-  const resumen = agrupar(filtradas);
+ const datasets=SHORT_DEMAND.map((name,i)=>({
 
-  $("estado").textContent =
-    `${filtradas.length} lecturas seleccionadas · `+
-    `Multiplicador ${MULTIPLICADOR} · `+
-    `${resumen.alertas} descensos de lectura por revisar`;
+  label:"Demanda hor. "+name,
 
-  const grupos = {};
+  data:groups.map(g=>g.demandBands[i]),
 
-  for(const r of lecturas){
-    if(anio!=="todos" && r.fecha.getFullYear()!==+anio)
-      continue;
+  backgroundColor:groups.map(g=>
+   g.winner===i
+    ?COLORS[i]
+    :COLORS[i]+"70"
+  ),
 
-    const clave = r.fecha.getFullYear()+"-"+
-      String(r.fecha.getMonth()+1).padStart(2,"0");
+  borderColor:COLORS[i],
 
-    (grupos[clave] ??= []).push(r);
-  }
+  borderWidth:groups.map(g=>
+   g.winner===i?3:1
+  ),
 
-  const etiquetas = Object.keys(grupos).sort();
-  const resumenes = etiquetas.map(k=>agrupar(grupos[k]));
+  borderRadius:5,
+  maxBarThickness:45
+ }));
 
-  const total = resumen.energia[0];
-  const A = resumen.energia[1];
-  const B = resumen.energia[2];
-  const nocturno = resumen.energia[3];
-  const finSemana = resumen.energia[4];
+ charts[id]=new Chart($(id),{
+  type:"bar",
+  data:{
+   labels:groups.map(g=>g.key),
+   datasets
+  },
+  options:{
+   responsive:true,
+   maintainAspectRatio:false,
+   interaction:{mode:"index",intersect:false},
+   plugins:{
+    legend:{
+     position:"bottom",
+     labels:{
+      boxWidth:11,
+      usePointStyle:true,
+      font:{size:11}
+     }
+    },
+    tooltip:{
+     callbacks:{
+      label(context){
+       const value=context.parsed.y;
+       const group=groups[context.dataIndex];
 
-  const mesUnico = anio!=="todos" && mes!=="todos";
-  const D = entrada("d");
+       if(value===null)return "Sin datos";
 
-  const C = D===null ? null : total-A-B-D;
+       const isMax=
+        group.max!==null&&value===group.max;
 
-  const valido =
-    mesUnico &&
-    resumen.cantidad>0 &&
-    D!==null &&
-    D>=0 &&
-    D<=finSemana &&
-    C>=0;
-
-  const cantidades = [A,B,C,D];
-
-  const tarifas = [
-    positivo("ta"),
-    positivo("tb"),
-    positivo("tc"),
-    positivo("td")
-  ];
-
-  const costos = valido
-    ? cantidades.map((q,i)=>q*tarifas[i])
-    : null;
-
-  const costoEnergia = costos
-    ? costos.reduce((a,b)=>a+b,0)
-    : null;
-
-  const costoDemanda =
-    mesUnico && resumen.demanda!==null
-      ? resumen.demanda*positivo("tkw")
-      : null;
-
-  const totalFactura =
-    costoEnergia!==null && costoDemanda!==null
-      ? costoEnergia+
-        costoDemanda+
-        positivo("com")+
-        positivo("alumbrado")+
-        positivo("multa")+
-        (entrada("otros") ?? 0)-
-        positivo("agp")
-      : null;
-
-  const indicadores = [
-    ["Consumo total",formato(total)+" kWh"],
-    ["Franja A",formato(A)+" kWh"],
-    ["Franja B",formato(B)+" kWh"],
-    ["Registro nocturno",formato(nocturno)+" kWh"],
-    ["Sábados/domingos/feriados",formato(finSemana)+" kWh"],
-    ["Demanda máxima",
-      resumen.demanda===null
-        ? "—"
-        : formato(resumen.demanda,2)+" kW"],
-    ["Factor de potencia",formato(resumen.fp,4)],
-    ["Alertas de lectura",formato(resumen.alertas)],
-    ["Costo energía",dinero(costoEnergia)],
-    ["Costo demanda",dinero(costoDemanda)],
-    ["Costo total estimado",dinero(totalFactura)]
-  ];
-
-  $("kpis").innerHTML = indicadores.map(([nombre,valor])=>`
-    <div class="kpi">
-      <small>${nombre}</small>
-      <strong>${valor}</strong>
-    </div>
-  `).join("");
-
-  const series = {
-    total:resumenes.map(r=>r.energia[0]),
-    a:resumenes.map(r=>r.energia[1]),
-    b:resumenes.map(r=>r.energia[2]),
-    nocturno:resumenes.map(r=>r.energia[3]),
-    findesemana:resumenes.map(r=>r.energia[4]),
-    demanda:resumenes.map(r=>r.demanda),
-    fp:resumenes.map(r=>r.fp)
-  };
-
-  const indicador = $("indicador").value;
-
-  const titulo =
-    $("indicador").selectedOptions[0].textContent;
-
-  $("tituloPrincipal").textContent = titulo;
-
-  crearGrafico(
-    "graficoPrincipal",
-    $("tipo").value,
-    etiquetas,
-    [serie(titulo,series[indicador],"#078b94")]
-  );
-
-  crearGrafico(
-    "graficoFranjas","bar",etiquetas,[
-      serie("Total",resumenes.map(r=>r.energia[0]),"#087f91"),
-      serie("A",resumenes.map(r=>r.energia[1]),"#e5a026"),
-      serie("B",resumenes.map(r=>r.energia[2]),"#527fc7"),
-      serie("Nocturno",resumenes.map(r=>r.energia[3]),"#51a385"),
-      serie("S/D/F",resumenes.map(r=>r.energia[4]),"#a476b6")
-    ]
-  );
-
-  crearGrafico(
-    "graficoDemanda","line",etiquetas,[
-      serie("Demanda kW",
-        resumenes.map(r=>r.demanda),"#e5a026")
-    ]
-  );
-
-  crearGrafico(
-    "graficoFP","line",etiquetas,[
-      serie("Factor de potencia",
-        resumenes.map(r=>r.fp),"#417acb")
-    ]
-  );
-
-  crearGrafico(
-    "graficoCostos","bar",["A","B","C","D"],[
-      serie("USD",
-        costos ?? [null,null,null,null],
-        "#159473")
-    ]
-  );
-
-  crearGrafico(
-    "graficoDistribucion","doughnut",
-    ["A","B","C","D"],[
-      {
-        label:"kWh",
-        data:valido ? cantidades : [0,0,0,0],
-        backgroundColor:[
-          "#e5a026","#527fc7","#51a385","#a476b6"
-        ]
+       return(
+        context.dataset.label+": "+
+        nf(value)+" kW"+
+        (isMax?" ★ DEMANDA MÁXIMA":"")
+       );
       }
-    ]
-  );
-
-  $("conciliacion").textContent =
-    "Registro 1 (total): "+formato(total)+" kWh. "+
-    "Registro 2: "+formato(A)+" kWh. "+
-    "Registro 3: "+formato(B)+" kWh. "+
-    "Registro 4: "+formato(nocturno)+" kWh. "+
-    "Registro 5: "+formato(finSemana)+" kWh. "+
-    "Los registros no se suman automáticamente porque "+
-    "pueden existir solapamientos. "+
-    (valido
-      ? "Franja C calculada provisionalmente como "+
-        "total menos A, B y D. Verificar con CNEL."
-      : "Seleccione un solo mes e ingrese la franja D "+
-        "de la factura para calcular los costos.");
-
-  const filasFactura = [
-    ["Franja A",A,costos?.[0]],
-    ["Franja B",B,costos?.[1]],
-    ["Franja C provisional",C,costos?.[2]],
-    ["Franja D",D,costos?.[3]],
-    ["Demanda",resumen.demanda,costoDemanda],
-    ["Comercialización",null,
-      mesUnico?positivo("com"):null],
-    ["Descuento AGP",null,
-      mesUnico?-positivo("agp"):null],
-    ["Alumbrado",null,
-      mesUnico?positivo("alumbrado"):null],
-    ["Penalización FP",null,
-      mesUnico?positivo("multa"):null],
-    ["Otros cargos netos",null,
-      mesUnico?(entrada("otros")??0):null],
-    ["TOTAL ESTIMADO",null,totalFactura]
-  ];
-
-  $("facturacion").innerHTML =
-    filasFactura.map(([nombre,cantidad,costo])=>`
-      <tr>
-        <td>${nombre}</td>
-        <td>${formato(cantidad,2)}</td>
-        <td>${dinero(costo)}</td>
-      </tr>
-    `).join("");
-
-  $("historico").innerHTML =
-    etiquetas.map((k,i)=>{
-      const r=resumenes[i];
-
-      return `<tr>
-        <td>${k}</td>
-        ${r.energia.map(v=>`<td>${formato(v)}</td>`).join("")}
-        <td>${formato(r.demanda,2)}</td>
-        <td>${formato(r.fp,4)}</td>
-        <td>${r.alertas}</td>
-      </tr>`;
-    }).join("");
+     }
+    }
+   },
+   scales:{
+    x:{grid:{display:false},ticks:{maxRotation:45}},
+    y:{
+     beginAtZero:true,
+     title:{display:true,text:"Demanda máxima (kW)"},
+     grid:{color:"#edf1f7"}
+    }
+   }
+  }
+ });
 }
 
-[
-  "anio","mes","indicador","tipo",
-  "ta","tb","tc","td","tkw","d",
-  "agp","com","alumbrado","multa","otros"
-].forEach(id=>{
-  $(id).addEventListener("change",actualizar);
+function renderDemandAnalysis(selectedReadings,rates){
+
+ const mode=$("period").value;
+
+ const groups=demandGroups(selectedReadings,mode);
+ const monthlyGroups=demandGroups(selectedReadings,"month");
+
+ drawDemandChart("chartDemand",groups);
+ drawDemandChart("chartDemandDetail",groups);
+
+ const maxByBand=[0,1,2,3].map(i=>
+  maxValid(
+   selectedReadings.map(r=>r.demandBands[i])
+  )
+ );
+
+ const globalMax=maxValid(maxByBand);
+
+ const winners=globalMax===null
+  ?[]
+  :maxByBand.map((v,i)=>({v,i}))
+   .filter(x=>x.v===globalMax);
+
+ const winnerNames=winners.map(
+  x=>"Horario "+String.fromCharCode(65+x.i)
+ ).join(" / ");
+
+ $("demandMaxInfo").textContent=
+  globalMax===null
+   ?"No se encontraron lecturas válidas de demanda."
+   :"★ DEMANDA MÁXIMA REGISTRADA: "+
+    nf(globalMax)+" kW · "+
+    winnerNames+
+    ". Tarifa de demanda: "+
+    money(rates[4])+"/kW. "+
+    "La demanda facturable se calcula una vez por mes.";
+
+ const headers=[
+  "Período",
+  "Demanda A (kW)",
+  "Demanda B (kW)",
+  "Demanda C (kW)",
+  "Demanda D (kW)",
+  "Demanda máxima (kW)",
+  "Horario máximo"
+ ];
+
+ const rows=groups.map(g=>[
+  g.key,
+  ...g.demandBands.map(v=>
+   v===null?"—":nf(v)
+  ),
+  g.max===null?"—":nf(g.max),
+  g.winner<0?"—":
+   "Horario "+String.fromCharCode(65+g.winner)
+ ]);
+
+ const highlight=(ri,ci)=>{
+  const g=groups[ri];
+  return g.winner>=0&&(
+   ci===g.winner+1||
+   ci===5||
+   ci===6
+  );
+ };
+
+ table("demandScheduleTable",headers,rows,highlight);
+ table("demandTable",headers,rows,highlight);
+
+ draw("chartMonthlyDemand","bar",
+  monthlyGroups.map(g=>g.key),
+  [{
+   label:"Demanda facturable máxima (kW)",
+   data:monthlyGroups.map(g=>g.max),
+   backgroundColor:COLORS[0],
+   borderRadius:5
+  }]
+ );
+}
+
+// =======================================
+// DISTRIBUCIÓN ENERGÍA / COSTOS CNEL
+// =======================================
+
+function changeMixMode(mode){
+ mixMode=mode;
+
+ if(mixData){
+  renderMixChart(
+   mixData.bands,
+   mixData.bandCosts,
+   mixData.rates
+  );
+ }
+}
+
+function renderMixChart(bands,bandCosts,rates){
+
+ mixData={
+  bands:[...bands],
+  bandCosts:[...bandCosts],
+  rates:[...rates]
+ };
+
+ const totalKwh=bands.reduce((a,b)=>a+b,0);
+ const totalCost=bandCosts.reduce((a,b)=>a+b,0);
+
+ const values=mixMode==="energy"?bands:bandCosts;
+ const total=values.reduce((a,b)=>a+b,0);
+
+ const percentages=values.map(v=>
+  total>0?v/total*100:0
+ );
+
+ const energyPct=bands.map(v=>
+  totalKwh>0?v/totalKwh*100:0
+ );
+
+ const costPct=bandCosts.map(v=>
+  totalCost>0?v/totalCost*100:0
+ );
+
+ $("mixEnergyBtn").className=
+  mixMode==="energy"?"btn blue":"btn light";
+
+ $("mixCostBtn").className=
+  mixMode==="cost"?"btn blue":"btn light";
+
+ $("mixTotalEnergy").textContent=nf(totalKwh)+" kWh";
+ $("mixTotalCost").textContent=money(totalCost);
+
+ if(typeof Chart!=="undefined"){
+
+  if(charts.chartMix)charts.chartMix.destroy();
+
+  charts.chartMix=new Chart($("chartMix"),{
+   type:"doughnut",
+   data:{
+    labels:ENERGY_LABELS,
+    datasets:[{
+     data:values,
+     backgroundColor:COLORS,
+     borderWidth:3,
+     borderColor:"#fff",
+     hoverOffset:12,
+     borderRadius:4
+    }]
+   },
+   options:{
+    responsive:true,
+    maintainAspectRatio:false,
+    cutout:"65%",
+    plugins:{
+     legend:{display:false},
+     tooltip:{
+      callbacks:{
+       label(context){
+        const i=context.dataIndex;
+        return[
+         "Participación: "+percentages[i].toFixed(2)+"%",
+         "Energía: "+nf(bands[i])+" kWh",
+         "Costo: "+money(bandCosts[i]),
+         "Tarifa: "+money(rates[i])+"/kWh"
+        ];
+       }
+      }
+     }
+    }
+   },
+   plugins:[{
+    id:"centerText",
+    afterDraw(chart){
+
+     const {ctx,chartArea}=chart;
+     if(!chartArea)return;
+
+     const x=(chartArea.left+chartArea.right)/2;
+     const y=(chartArea.top+chartArea.bottom)/2;
+
+     ctx.save();
+     ctx.textAlign="center";
+     ctx.textBaseline="middle";
+
+     ctx.fillStyle="#718198";
+     ctx.font="12px Segoe UI";
+     ctx.fillText(
+      mixMode==="energy"?"Consumo total":"Costo total",
+      x,y-17
+     );
+
+     ctx.fillStyle="#1b2940";
+     ctx.font="bold 19px Segoe UI";
+     ctx.fillText(
+      mixMode==="energy"
+       ?nf(totalKwh)+" kWh"
+       :money(totalCost),
+      x,y+12
+     );
+
+     ctx.restore();
+    }
+   }]
+  });
+ }
+
+ const legend=$("mixLegend");
+ legend.replaceChildren();
+
+ ENERGY_LABELS.forEach((label,i)=>{
+
+  const wrapper=document.createElement("div");
+  const row=document.createElement("div");
+  row.className="mix-legend-row";
+
+  const name=document.createElement("div");
+  name.className="mix-legend-name";
+
+  const dot=document.createElement("span");
+  dot.className="dot";
+  dot.style.background=COLORS[i];
+
+  const text=document.createElement("span");
+  text.textContent=label;
+
+  name.append(dot,text);
+
+  const pct=document.createElement("strong");
+  pct.textContent=percentages[i].toFixed(1)+"%";
+
+  row.append(name,pct);
+
+  const bar=document.createElement("div");
+  bar.className="mix-bar";
+
+  const fill=document.createElement("div");
+  fill.className="mix-fill";
+  fill.style.width=percentages[i]+"%";
+  fill.style.background=COLORS[i];
+
+  bar.append(fill);
+  wrapper.append(row,bar);
+  legend.append(wrapper);
+ });
+
+ table("mixDetails",
+  ["Horario","% energía","kWh","% costo","Costo USD","$/kWh"],
+  ENERGY_LABELS.map((label,i)=>[
+   "Horario "+String.fromCharCode(65+i),
+   energyPct[i].toFixed(1)+"%",
+   nf(bands[i]),
+   costPct[i].toFixed(1)+"%",
+   money(bandCosts[i]),
+   rates[i].toFixed(4)
+  ])
+ );
+
+ const minRate=Math.min(...rates.slice(0,4));
+ const maxRate=Math.max(...rates.slice(0,4));
+
+ const cheapest=rates.slice(0,4)
+  .map((rate,i)=>({rate,i}))
+  .filter(x=>x.rate===minRate);
+
+ const expensive=rates.slice(0,4)
+  .map((rate,i)=>({rate,i}))
+  .filter(x=>x.rate===maxRate);
+
+ const cheapKwh=cheapest.reduce(
+  (sum,x)=>sum+bands[x.i],0
+ );
+
+ const cheapShare=totalKwh>0
+  ?cheapKwh/totalKwh*100:0;
+
+ $("mixInsight").textContent=
+  "ANÁLISIS TARIFARIO: El horario de menor costo es "+
+  cheapest.map(x=>String.fromCharCode(65+x.i)).join(", ")+
+  " ("+money(minRate)+"/kWh), con una participación del "+
+  cheapShare.toFixed(1)+"% del consumo ("+
+  nf(cheapKwh)+" kWh). "+
+  "El horario más costoso es "+
+  expensive.map(x=>String.fromCharCode(65+x.i)).join(", ")+
+  " ("+money(maxRate)+"/kWh). "+
+  "Trasladar 1.000 kWh desde el horario más caro "+
+  "al más económico representaría un ahorro teórico de "+
+  money((maxRate-minRate)*1000)+
+  ", siempre que sea operativamente posible.";
+}
+
+// =======================================
+// ANÁLISIS FINANCIERO EJECUTIVO
+// =======================================
+
+function financialRow(label,value){
+
+ const row=document.createElement("div");
+ row.className="financial-detail-row";
+
+ const name=document.createElement("span");
+ name.textContent=label;
+
+ const amount=document.createElement("strong");
+ amount.textContent=value;
+
+ row.append(name,amount);
+ return row;
+}
+
+function financialTotal(label,value){
+
+ const row=document.createElement("div");
+ row.className="financial-total";
+
+ const name=document.createElement("span");
+ name.textContent=label;
+
+ const amount=document.createElement("strong");
+ amount.textContent=value;
+
+ row.append(name,amount);
+ return row;
+}
+
+function financialInsight(title,description,kind=""){
+
+ const card=document.createElement("div");
+ card.className="financial-insight "+kind;
+
+ const heading=document.createElement("h4");
+ heading.textContent=title;
+
+ const text=document.createElement("p");
+ text.textContent=description;
+
+ card.append(heading,text);
+ return card;
+}
+
+function renderFinancialAnalysis(context){
+
+ const {
+  bands,bandCosts,rates,energyCost,
+  demandCost,demandAvailable,total,
+  monthly,selectedReadings,kwh,avgFp
+ }=context;
+
+ const composition=$("financialCompositionDetails");
+ const bandDetails=$("financialBandsDetails");
+ const insights=$("financialRecommendations");
+
+ const energyShare=total>0?energyCost/total*100:0;
+ const demandShare=total>0?demandCost/total*100:0;
+
+ composition.replaceChildren();
+
+ composition.append(
+  financialRow(
+   "Energía activa · "+percent(energyShare),
+   money(energyCost)
+  ),
+  financialRow(
+   "Demanda · "+percent(demandShare),
+   demandAvailable?money(demandCost):"Por validar"
+  ),
+  financialTotal(
+   "TOTAL ELÉCTRICO ESTIMADO",
+   demandAvailable?money(total):"Por validar"
+  )
+ );
+
+ bandDetails.replaceChildren();
+
+ bandCosts.forEach((cost,i)=>{
+
+  const share=energyCost>0
+   ?cost/energyCost*100:0;
+
+  bandDetails.append(
+   financialRow(
+    "Horario "+String.fromCharCode(65+i)+
+    " · "+percent(share),
+    money(cost)
+   )
+  );
+ });
+
+ bandDetails.append(
+  financialTotal(
+   "TOTAL ENERGÍA ACTIVA",
+   money(energyCost)
+  )
+ );
+
+ // GRÁFICO COMPOSICIÓN EN USD
+
+ draw("chartFinanceMix","doughnut",
+  ["Costo energía activa","Costo demanda"],
+  [{
+   label:"Costo",
+   data:[
+    energyCost,
+    demandAvailable?demandCost:0
+   ],
+   backgroundColor:[COLORS[0],COLORS[1]],
+   borderWidth:0
+  }],
+  false,
+  {
+   currency:true,
+   centerTotal:demandAvailable?total:0
+  }
+ );
+
+ // GRÁFICO COSTOS HORARIOS CON ETIQUETAS USD
+
+ draw("chartBandCosts","bar",
+  ["Horario A","Horario B","Horario C","Horario D"],
+  [{
+   label:"Costo USD",
+   data:bandCosts,
+   backgroundColor:COLORS,
+   borderRadius:6,
+   maxBarThickness:65
+  }],
+  false,
+  {
+   currency:true,
+   valueLabels:true
+  }
+ );
+
+ // COMENTARIOS AUTOMÁTICOS
+
+ insights.replaceChildren();
+
+ const maxCost=Math.max(...bandCosts);
+ const maxCostIndex=bandCosts.indexOf(maxCost);
+
+ const maxCostShare=energyCost>0
+  ?maxCost/energyCost*100:0;
+
+ insights.append(
+  financialInsight(
+   "01 · Concentración del gasto eléctrico",
+   "El horario "+
+   String.fromCharCode(65+maxCostIndex)+
+   " concentra el mayor gasto de energía: "+
+   money(maxCost)+" ("+
+   percent(maxCostShare)+
+   " del costo de energía activa). "+
+   "Se recomienda revisar los equipos de mayor consumo "+
+   "que operan durante este horario y evaluar "+
+   "oportunidades de eficiencia.",
+   "warning"
+  )
+ );
+
+ const minRate=Math.min(...rates.slice(0,4));
+ const maxRate=Math.max(...rates.slice(0,4));
+
+ const cheapest=rates.slice(0,4)
+  .map((v,i)=>({v,i}))
+  .filter(x=>x.v===minRate);
+
+ const expensive=rates.slice(0,4)
+  .map((v,i)=>({v,i}))
+  .filter(x=>x.v===maxRate);
+
+ const savingPer1000=(maxRate-minRate)*1000;
+
+ insights.append(
+  financialInsight(
+   "02 · Optimización de horarios tarifarios",
+   "La tarifa más económica corresponde al horario "+
+   cheapest.map(x=>String.fromCharCode(65+x.i)).join(", ")+
+   " ("+money(minRate)+"/kWh). "+
+   "La más costosa corresponde al horario "+
+   expensive.map(x=>String.fromCharCode(65+x.i)).join(", ")+
+   " ("+money(maxRate)+"/kWh). "+
+   "Trasladar 1.000 kWh entre ambos horarios "+
+   "podría representar un ahorro teórico de "+
+   money(savingPer1000)+
+   ", sujeto a la viabilidad operativa.",
+   "saving"
+  )
+ );
+
+ const maxDemand=maxValid(
+  selectedReadings.map(r=>r.demand)
+ );
+
+ const maxMonthly=monthly.reduce(
+  (best,g)=>
+   g.demand!==null&&
+   (!best||g.demand>best.demand)?g:best,
+  null
+ );
+
+ insights.append(
+  financialInsight(
+   "03 · Control de demanda máxima",
+   "La mayor demanda observada es "+
+   (maxDemand===null?"no disponible":
+    nf(maxDemand)+" kW")+
+   (maxMonthly
+    ?", registrada dentro del mes "+maxMonthly.key
+    :"")+
+   ". Se recomienda identificar arranques simultáneos "+
+   "de motores, bombas, compresores y equipos "+
+   "de alta potencia. Una reducción de 10 kW "+
+   "en la demanda facturable de un mes "+
+   "equivaldría a "+
+   money(10*rates[4])+
+   " de ahorro teórico para ese mes, "+
+   "si se mantienen la tarifa y el criterio "+
+   "de facturación.",
+   "saving"
+  )
+ );
+
+ insights.append(
+  financialInsight(
+   "04 · Factor de potencia y energía reactiva",
+   avgFp===null
+    ?"No hay lecturas válidas de factor de potencia. "+
+     "Se recomienda revisar la columna FP del Excel."
+    :"El factor de potencia promedio es "+
+     avgFp.toFixed(4)+
+     ", frente a la referencia mínima de 0,9400. "+
+     (avgFp<FP_MIN
+      ?"Se recomienda revisar bancos de capacitores, "+
+       "compensación reactiva y cargas inductivas."
+      :"El promedio cumple la referencia. "+
+       "Se recomienda mantener el monitoreo de "+
+       "lecturas inferiores a 0,94.")+
+     " Cualquier penalización debe verificarse "+
+     "en la factura CNEL.",
+   avgFp!==null&&avgFp<FP_MIN?"warning":"saving"
+  )
+ );
+
+ const avgPrice=kwh>0?energyCost/kwh:0;
+
+ insights.append(
+  financialInsight(
+   "05 · Costo energético unitario",
+   "El costo promedio ponderado de energía activa "+
+   "es "+money(avgPrice)+"/kWh. "+
+   "Se recomienda controlar mensualmente "+
+   "el indicador USD/kWh junto con la producción "+
+   "de la planta para identificar incrementos "+
+   "de costos no justificados por la operación."
+  )
+ );
+
+ insights.append(
+  financialInsight(
+   "06 · Seguimiento presupuestario",
+   "El costo de demanda representa "+
+   (demandAvailable
+    ?percent(demandShare)
+    :"una proporción aún no validada")+
+   " del gasto eléctrico estimado. "+
+   "Para Gerencia Financiera se recomienda comparar "+
+   "la factura real, el presupuesto mensual "+
+   "y los valores calculados en el dashboard. "+
+   "También conviene monitorear la variación "+
+   "mensual de energía, demanda máxima y "+
+   "costo por unidad de producción."
+  )
+ );
+}
+
+// =======================================
+// RENDER PRINCIPAL
+// =======================================
+
+function render(){
+
+ if(!readings.length)return;
+
+ const rates=getRates();
+
+ const selected=intervals.filter(
+  r=>matches(r.date)
+ );
+
+ const selectedReadings=readings.filter(
+  r=>matches(r.date)
+ );
+
+ const daily=aggregate(selected,"day",rates);
+ const weekly=aggregate(selected,"week",rates);
+ const monthly=aggregate(selected,"month",rates);
+
+ const display=aggregate(
+  selected,$("period").value,rates
+ );
+
+ const bands=[0,0,0,0];
+ let reactive=0;
+
+ selected.forEach(r=>{
+  r.bands.forEach((v,i)=>{
+   bands[i]+=v;
+  });
+  reactive+=r.reactive??0;
+ });
+
+ const kwh=bands.reduce((a,b)=>a+b,0);
+
+ const bandCosts=bands.map(
+  (v,i)=>v*rates[i]
+ );
+
+ const energyCost=bandCosts.reduce(
+  (a,b)=>a+b,0
+ );
+
+ const demands=selectedReadings
+  .map(r=>r.demand)
+  .filter(v=>v!==null);
+
+ const fps=selectedReadings
+  .map(r=>r.fp)
+  .filter(v=>v!==null);
+
+ const maxDemand=maxValid(demands);
+
+ const avgFp=fps.length
+  ?fps.reduce((a,b)=>a+b,0)/fps.length
+  :null;
+
+ const minFp=fps.length?Math.min(...fps):null;
+
+ const fpLow=fps.filter(v=>v<FP_MIN).length;
+
+ const fpLowPct=fps.length
+  ?fpLow/fps.length*100:null;
+
+ const demandAvailable=
+  monthly.length>0&&
+  monthly.every(g=>g.demandCost!==null);
+
+ const demandCost=monthly.reduce(
+  (a,g)=>a+(g.demandCost??0),0
+ );
+
+ const total=energyCost+demandCost;
+
+ const bill=demandAvailable?total:null;
+
+ const avgPrice=kwh?energyCost/kwh:null;
+
+ const maxDemandBands=[0,1,2,3].map(i=>
+  maxValid(
+   selectedReadings.map(r=>r.demandBands[i])
+  )
+ );
+
+ // INDICADORES EJECUTIVOS
+
+ kpis("executiveKpis",[
+  [
+   "Costo eléctrico estimado",
+   bill===null?"Por validar":money(bill),
+   "Energía + demanda mensual","＄"
+  ],
+  [
+   "Energía activa total",
+   nf(kwh)+" kWh",
+   "Consumo total de horarios CNEL","⚡"
+  ],
+  [
+   "Demanda máxima",
+   maxDemand===null?"Sin datos":nf(maxDemand)+" kW",
+   "Mayor demanda de A, B, C y D","◈"
+  ],
+  [
+   "Factor de potencia promedio",
+   avgFp===null?"Sin datos":avgFp.toFixed(4),
+   avgFp===null?"Sin lecturas":
+    avgFp<FP_MIN?"Bajo referencia 0,94":"Cumple referencia 0,94",
+   "◉",
+   avgFp===null?"":avgFp<FP_MIN?"bad":"good"
+  ],
+  [
+   "Costo energía activa",
+   money(energyCost),
+   "Suma de costos por horario","▣"
+  ],
+  [
+   "Costo de demanda",
+   demandAvailable?money(demandCost):"Por validar",
+   "Cargo de demanda mensual","＄"
+  ],
+  [
+   "Precio medio de energía",
+   avgPrice===null?"—":money(avgPrice)+"/kWh",
+   "Sin incluir demanda","↗"
+  ],
+  [
+   "Lecturas con FP inferior a 0,94",
+   fpLowPct===null?"Sin datos":nf(fpLowPct)+"%",
+   fpLow+" de "+fps.length+" lecturas",
+   "⚠",fpLow>0?"bad":"good"
+  ]
+ ]);
+
+ // INDICADORES ENERGÍA
+
+ kpis("energyKpis",
+  bands.map((v,i)=>[
+   ENERGY_LABELS[i],
+   nf(v)+" kWh",
+   money(bandCosts[i])+
+   " · "+money(rates[i])+"/kWh",
+   ["☀","◐","☾","◷"][i]
+  ])
+ );
+
+ // INDICADORES DEMANDA
+
+ kpis("demandKpis",[
+  ...maxDemandBands.map((v,i)=>[
+   DEMAND_LABELS[i],
+   v===null?"Sin datos":nf(v)+" kW",
+   "Máximo de "+(i+6)+"KW ×350",
+   "◈",
+   v!==null&&v===maxDemand?"good":""
+  ]),
+  [
+   "Demanda máxima facturable",
+   maxDemand===null?"Sin datos":nf(maxDemand)+" kW",
+   "Mayor demanda registrada","⚡","good"
+  ],
+  [
+   "Costo de demanda mensual",
+   demandAvailable?money(demandCost):"Por validar",
+   "Mayor demanda por mes × "+money(rates[4])+"/kW",
+   "＄"
+  ]
+ ]);
+
+ // FACTOR DE POTENCIA
+
+ kpis("fpKpis",[
+  [
+   "FP promedio",
+   avgFp===null?"Sin datos":avgFp.toFixed(4),
+   "Referencia mínima 0,94","◉",
+   avgFp===null?"":avgFp<FP_MIN?"bad":"good"
+  ],
+  [
+   "FP mínimo",
+   minFp===null?"Sin datos":minFp.toFixed(4),
+   "Menor lectura registrada","⚠",
+   minFp!==null&&minFp<FP_MIN?"bad":"good"
+  ],
+  [
+   "Lecturas bajo 0,94",
+   nf(fpLow),
+   "Registros inferiores al límite","▣",
+   fpLow>0?"bad":"good"
+  ],
+  [
+   "Porcentaje de lecturas bajas",
+   fpLowPct===null?"Sin datos":nf(fpLowPct)+"%",
+   "Lecturas con FP inferior a 0,94","◈",
+   fpLow>0?"bad":"good"
+  ]
+ ]);
+
+ $("fpObservation").textContent=
+  avgFp===null
+   ?"No se encontraron lecturas válidas de factor de potencia."
+   :avgFp<FP_MIN
+    ?"El FP promedio está por debajo de 0,94. Se recomienda revisar los bancos de capacitores, compensación reactiva y condiciones de operación. El promedio no determina por sí solo una penalización CNEL."
+    :"El FP promedio cumple la referencia de 0,94. Revisa también las lecturas individuales y el criterio real de facturación.";
+
+ // INDICADORES FINANCIEROS
+
+ kpis("financeKpis",[
+  [
+   "Costo energía activa",
+   money(energyCost),
+   "Horarios A, B, C y D","⚡"
+  ],
+  [
+   "Costo demanda",
+   demandAvailable?money(demandCost):"Por validar",
+   "Cargo mensual","◈"
+  ],
+  [
+   "Total eléctrico estimado",
+   bill===null?"Por validar":money(bill),
+   "Sin otros cargos","＄"
+  ],
+  [
+   "Costo medio de energía",
+   avgPrice===null?"—":money(avgPrice)+"/kWh",
+   "Costo ponderado","▣"
+  ]
+ ]);
+
+ // GRÁFICOS EJECUTIVOS
+
+ const labels=display.map(g=>g.key);
+
+ draw("chartConsumption","bar",labels,[{
+  label:"Consumo total (kWh)",
+  data:display.map(g=>g.kwh),
+  backgroundColor:COLORS[0],
+  borderRadius:5
+ }]);
+
+ renderMixChart(bands,bandCosts,rates);
+
+ draw("chartCost","line",labels,[
+  {
+   label:"Costo energía USD",
+   data:display.map(g=>g.energyCost),
+   borderColor:COLORS[0],
+   backgroundColor:COLORS[0],
+   tension:.35
+  },
+  {
+   label:"Costo demanda USD (mensual)",
+   data:$("period").value==="month"
+    ?display.map(g=>g.demandCost):[],
+   borderColor:COLORS[1],
+   backgroundColor:COLORS[1],
+   tension:.35
+  }
+ ],false,{currency:true});
+
+ // DEMANDAS MÁXIMAS
+
+ renderDemandAnalysis(selectedReadings,rates);
+
+ // FACTOR DE POTENCIA
+
+ const fpDatasets=[
+  {
+   label:"FP promedio",
+   data:display.map(g=>g.fp),
+   borderColor:COLORS[0],
+   backgroundColor:COLORS[0],
+   tension:.3,
+   pointRadius:4
+  },
+  {
+   label:"Referencia mínima 0,94",
+   data:labels.map(()=>FP_MIN),
+   borderColor:"#e05260",
+   borderDash:[8,5],
+   pointRadius:0,
+   borderWidth:2
+  }
+ ];
+
+ draw("chartFP","line",labels,fpDatasets);
+ draw("chartFPDetail","line",labels,fpDatasets);
+
+ // ENERGÍA POR HORARIO
+
+ draw("chartBands","bar",labels,
+  ENERGY_LABELS.map((name,i)=>({
+   label:name,
+   data:display.map(g=>g.bands[i]),
+   backgroundColor:COLORS[i],
+   borderRadius:4
+  })),true
+ );
+
+ // ANÁLISIS FINANCIERO MEJORADO
+
+ renderFinancialAnalysis({
+  bands,
+  bandCosts,
+  rates,
+  energyCost,
+  demandCost,
+  demandAvailable,
+  total,
+  monthly,
+  selectedReadings,
+  kwh,
+  avgFp
+ });
+
+ // TABLAS FINANCIERAS
+
+ const monthHeaders=[
+  "Mes",
+  "Energía A (kWh)",
+  "Energía B (kWh)",
+  "Energía C (kWh)",
+  "Energía D (kWh)",
+  "Total kWh",
+  "Costo energía",
+  "Demanda facturable kW",
+  "Costo demanda",
+  "Total estimado",
+  "FP promedio"
+ ];
+
+ const monthRows=monthly.map(g=>[
+  g.key,
+  ...g.bands.map(nf),
+  nf(g.kwh),
+  money(g.energyCost),
+  g.demand===null?"—":nf(g.demand),
+  g.demandCost===null?"—":money(g.demandCost),
+  g.bill===null?"—":money(g.bill),
+  g.fp===null?"—":g.fp.toFixed(4)
+ ]);
+
+ table("executiveTable",monthHeaders,monthRows);
+ table("financeTable",monthHeaders,monthRows);
+
+ table("energyTable",
+  [
+   "Descripción CNEL",
+   "Registro Excel",
+   "Tarifa",
+   "Energía activa",
+   "Costo"
+  ],
+  ENERGY_LABELS.map((label,i)=>[
+   label,
+   (i+2)+"KWH",
+   money(rates[i])+"/kWh",
+   nf(bands[i])+" kWh",
+   money(bandCosts[i])
+  ])
+ );
+
+ // DETALLE SEMANAL Y DIARIO
+
+ const detailHeaders=[
+  "Período",
+  "Energía A (kWh)",
+  "Energía B (kWh)",
+  "Energía C (kWh)",
+  "Energía D (kWh)",
+  "Total kWh",
+  "Costo energía",
+  "Demanda máxima kW"
+ ];
+
+ const detailRows=groups=>groups.map(g=>[
+  g.key,
+  ...g.bands.map(nf),
+  nf(g.kwh),
+  money(g.energyCost),
+  g.demand===null?"—":nf(g.demand)
+ ]);
+
+ table("weeklyTable",detailHeaders,detailRows(weekly));
+ table("dailyTable",detailHeaders,detailRows(daily));
+}
+
+// =======================================
+// NAVEGACIÓN
+// =======================================
+
+function switchPage(page){
+
+ document.querySelectorAll("[data-view]")
+  .forEach(el=>{
+   el.classList.toggle(
+    "hidden",
+    el.dataset.view!==page
+   );
+  });
+
+ document.querySelectorAll("#menu button")
+  .forEach(btn=>{
+   btn.classList.toggle(
+    "active",
+    btn.dataset.page===page
+   );
+  });
+
+ const titles={
+  dashboard:"Dashboard ejecutivo",
+  energia:"Energía activa CNEL",
+  demanda:"Demandas máximas",
+  fp:"Factor de potencia",
+  finanzas:"Análisis financiero",
+  detalle:"Detalle de consumos",
+  config:"Configuración y diagnóstico"
+ };
+
+ $("pageTitle").textContent=titles[page];
+
+ if(readings.length){
+  render();
+  requestAnimationFrame(()=>{
+   Object.values(charts).forEach(c=>c.resize());
+  });
+ }
+}
+
+// =======================================
+// EVENTOS
+// =======================================
+
+document.querySelectorAll("#menu button")
+ .forEach(btn=>{
+  btn.addEventListener("click",()=>{
+   switchPage(btn.dataset.page);
+  });
+ });
+
+$("uploadButton").addEventListener("click",()=>{
+ $("excel").click();
 });
 
-cargarExcel();
+$("printButton").addEventListener("click",()=>{
+ window.print();
+});
+
+$("excel").addEventListener("change",async event=>{
+
+ const file=event.target.files[0];
+ if(!file)return;
+
+ status("Procesando "+file.name+"...");
+
+ try{
+
+  if(typeof XLSX==="undefined"){
+   throw Error(
+    "No se cargó la librería Excel. Comprueba Internet."
+   );
+  }
+
+  const bytes=await file.arrayBuffer();
+
+  const wb=XLSX.read(bytes,{
+   type:"array",
+   cellDates:true
+  });
+
+  importWorkbook(wb);
+
+  $("fileName").textContent=file.name;
+
+  switchPage("dashboard");
+
+ }catch(error){
+  console.error(error);
+  status("Error al importar: "+error.message,"error");
+ }
+
+ event.target.value="";
+});
+
+["year","period"].forEach(id=>{
+ $(id).addEventListener("change",render);
+});
+
+[
+ "rateA","rateB","rateC",
+ "rateD","rateDemand"
+].forEach(id=>{
+ $(id).addEventListener("input",render);
+});
+
+$("reset").addEventListener("click",()=>{
+ $("year").value="all";
+ $("period").value="month";
+ selectedMonths.clear();
+ buildMonthOptions();
+ updateMonthButton();
+ render();
+});
+
+$("mixEnergyBtn").addEventListener("click",()=>{
+ changeMixMode("energy");
+});
+
+$("mixCostBtn").addEventListener("click",()=>{
+ changeMixMode("cost");
+});
+
+// =======================================
+// PANTALLA INICIAL
+// =======================================
+
+buildMonthOptions();
+updateMonthButton();
+
+kpis("executiveKpis",[
+ ["Costo eléctrico estimado","—","Adjunta tu Excel","＄"],
+ ["Energía activa total","—","Esperando lecturas","⚡"],
+ ["Demanda máxima","—","Esperando lecturas","◈"],
+ ["Factor de potencia","—","Referencia mínima 0,94","◉"]
+]);
+
 </script>
+
 </body>
 </html>
